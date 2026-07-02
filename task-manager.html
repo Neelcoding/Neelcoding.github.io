@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Weekly Task Manager</title>
+<style>
+	:root {
+		--bg: #f4f5f7;
+		--card: #ffffff;
+		--ink: #1f2430;
+		--muted: #7a8194;
+		--line: #e4e6ec;
+		--accent: #4f6df5;
+		--accent-soft: #eaefff;
+		--done: #b7bcc7;
+		--today: #fff4e0;
+		--today-line: #f0b95c;
+	}
+	* { box-sizing: border-box; }
+	body {
+		margin: 0;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+		background: var(--bg);
+		color: var(--ink);
+	}
+	.wrap {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 32px 24px 64px;
+	}
+	header.top {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 16px;
+		margin-bottom: 24px;
+	}
+	header.top h1 {
+		font-size: 1.6rem;
+		margin: 0;
+	}
+	header.top p {
+		margin: 4px 0 0;
+		color: var(--muted);
+		font-size: 0.9rem;
+	}
+	.nav-controls {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+	.nav-controls button {
+		border: 1px solid var(--line);
+		background: var(--card);
+		color: var(--ink);
+		border-radius: 8px;
+		padding: 8px 14px;
+		font-size: 0.9rem;
+		cursor: pointer;
+	}
+	.nav-controls button:hover {
+		border-color: var(--accent);
+		color: var(--accent);
+	}
+	.nav-controls .range {
+		font-weight: 600;
+		min-width: 190px;
+		text-align: center;
+	}
+	.board {
+		display: grid;
+		grid-template-columns: repeat(7, minmax(150px, 1fr));
+		gap: 12px;
+	}
+	@media (max-width: 900px) {
+		.board { grid-template-columns: 1fr; }
+	}
+	.day {
+		background: var(--card);
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		padding: 14px;
+		display: flex;
+		flex-direction: column;
+		min-height: 260px;
+	}
+	.day.is-today {
+		background: var(--today);
+		border-color: var(--today-line);
+	}
+	.day-head {
+		margin-bottom: 10px;
+	}
+	.day-head .dname {
+		font-weight: 700;
+		font-size: 0.95rem;
+	}
+	.day-head .ddate {
+		color: var(--muted);
+		font-size: 0.8rem;
+	}
+	.task-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.task {
+		display: flex;
+		align-items: flex-start;
+		gap: 8px;
+		background: var(--accent-soft);
+		border-radius: 8px;
+		padding: 6px 8px;
+	}
+	.day.is-today .task {
+		background: rgba(255,255,255,0.6);
+	}
+	.task input[type="checkbox"] {
+		margin-top: 3px;
+		accent-color: var(--accent);
+		cursor: pointer;
+		flex-shrink: 0;
+	}
+	.task .txt {
+		flex: 1;
+		font-size: 0.88rem;
+		line-height: 1.3;
+		word-break: break-word;
+		cursor: pointer;
+	}
+	.task.done .txt {
+		text-decoration: line-through;
+		color: var(--done);
+	}
+	.task .del {
+		border: none;
+		background: transparent;
+		color: var(--muted);
+		cursor: pointer;
+		font-size: 1rem;
+		line-height: 1;
+		padding: 0 2px;
+		flex-shrink: 0;
+	}
+	.task .del:hover { color: #d9534f; }
+	.add-row {
+		display: flex;
+		gap: 6px;
+		margin-top: 10px;
+	}
+	.add-row input {
+		flex: 1;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		padding: 7px 8px;
+		font-size: 0.85rem;
+		min-width: 0;
+	}
+	.add-row input:focus {
+		outline: none;
+		border-color: var(--accent);
+	}
+	.add-row button {
+		border: none;
+		background: var(--accent);
+		color: #fff;
+		border-radius: 8px;
+		padding: 0 12px;
+		font-size: 1rem;
+		cursor: pointer;
+	}
+	.add-row button:hover { opacity: 0.9; }
+	.empty-hint {
+		color: var(--muted);
+		font-size: 0.8rem;
+		font-style: italic;
+	}
+	footer.foot {
+		margin-top: 28px;
+		text-align: center;
+		color: var(--muted);
+		font-size: 0.8rem;
+	}
+</style>
+</head>
+<body>
+<div class="wrap">
+	<header class="top">
+		<div>
+			<h1>Weekly Task Manager</h1>
+			<p>Add tasks to any day, check them off when done. Saved automatically in this browser.</p>
+		</div>
+		<div class="nav-controls">
+			<button id="prevWeek">&larr; Prev</button>
+			<button id="todayBtn">Today</button>
+			<button id="nextWeek">Next &rarr;</button>
+			<span class="range" id="weekRange"></span>
+		</div>
+	</header>
+
+	<div class="board" id="board"></div>
+
+	<footer class="foot">Tasks are stored locally in your browser (localStorage) — nothing is sent anywhere.</footer>
+</div>
+
+<script>
+(function () {
+	var STORAGE_KEY = 'weeklyTaskManager.tasksByDate';
+	var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+	var current = new Date();
+	current.setHours(0, 0, 0, 0);
+
+	function loadAll() {
+		try {
+			return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+		} catch (e) {
+			return {};
+		}
+	}
+	function saveAll(data) {
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+	}
+	function dateKey(d) {
+		var y = d.getFullYear();
+		var m = String(d.getMonth() + 1).padStart(2, '0');
+		var day = String(d.getDate()).padStart(2, '0');
+		return y + '-' + m + '-' + day;
+	}
+	function isSameDay(a, b) {
+		return a.getFullYear() === b.getFullYear() &&
+			a.getMonth() === b.getMonth() &&
+			a.getDate() === b.getDate();
+	}
+	function startOfWeek(d) {
+		var res = new Date(d);
+		var dow = res.getDay(); // 0 = Sunday
+		var diff = dow === 0 ? -6 : 1 - dow; // start on Monday
+		res.setDate(res.getDate() + diff);
+		res.setHours(0, 0, 0, 0);
+		return res;
+	}
+	function fmtShort(d) {
+		return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+	}
+
+	var board = document.getElementById('board');
+	var weekRange = document.getElementById('weekRange');
+
+	function render() {
+		var data = loadAll();
+		var monday = startOfWeek(current);
+		var today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		var days = [];
+		for (var i = 0; i < 7; i++) {
+			var d = new Date(monday);
+			d.setDate(monday.getDate() + i);
+			days.push(d);
+		}
+
+		weekRange.textContent = fmtShort(days[0]) + ' – ' + fmtShort(days[6]) + ', ' + days[0].getFullYear();
+
+		board.innerHTML = '';
+		days.forEach(function (d) {
+			var key = dateKey(d);
+			var tasks = data[key] || [];
+			var isToday = isSameDay(d, today);
+
+			var col = document.createElement('div');
+			col.className = 'day' + (isToday ? ' is-today' : '');
+
+			var head = document.createElement('div');
+			head.className = 'day-head';
+			head.innerHTML = '<div class="dname">' + dayNames[d.getDay()] + '</div><div class="ddate">' + fmtShort(d) + '</div>';
+			col.appendChild(head);
+
+			var list = document.createElement('ul');
+			list.className = 'task-list';
+
+			if (tasks.length === 0) {
+				var hint = document.createElement('li');
+				hint.className = 'empty-hint';
+				hint.textContent = 'No tasks yet';
+				list.appendChild(hint);
+			}
+
+			tasks.forEach(function (task, idx) {
+				var li = document.createElement('li');
+				li.className = 'task' + (task.done ? ' done' : '');
+
+				var cb = document.createElement('input');
+				cb.type = 'checkbox';
+				cb.checked = !!task.done;
+				cb.addEventListener('change', function () {
+					var all = loadAll();
+					all[key][idx].done = cb.checked;
+					saveAll(all);
+					render();
+				});
+
+				var txt = document.createElement('span');
+				txt.className = 'txt';
+				txt.textContent = task.text;
+				txt.addEventListener('click', function () {
+					cb.checked = !cb.checked;
+					cb.dispatchEvent(new Event('change'));
+				});
+
+				var del = document.createElement('button');
+				del.className = 'del';
+				del.innerHTML = '&times;';
+				del.title = 'Remove task';
+				del.addEventListener('click', function () {
+					var all = loadAll();
+					all[key].splice(idx, 1);
+					saveAll(all);
+					render();
+				});
+
+				li.appendChild(cb);
+				li.appendChild(txt);
+				li.appendChild(del);
+				list.appendChild(li);
+			});
+
+			col.appendChild(list);
+
+			var addRow = document.createElement('div');
+			addRow.className = 'add-row';
+			var input = document.createElement('input');
+			input.type = 'text';
+			input.placeholder = 'Add a task...';
+			var addBtn = document.createElement('button');
+			addBtn.textContent = '+';
+			addBtn.title = 'Add task';
+
+			function addTask() {
+				var val = input.value.trim();
+				if (!val) return;
+				var all = loadAll();
+				if (!all[key]) all[key] = [];
+				all[key].push({ text: val, done: false });
+				saveAll(all);
+				input.value = '';
+				render();
+			}
+			addBtn.addEventListener('click', addTask);
+			input.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter') addTask();
+			});
+
+			addRow.appendChild(input);
+			addRow.appendChild(addBtn);
+			col.appendChild(addRow);
+
+			board.appendChild(col);
+		});
+	}
+
+	document.getElementById('prevWeek').addEventListener('click', function () {
+		current.setDate(current.getDate() - 7);
+		render();
+	});
+	document.getElementById('nextWeek').addEventListener('click', function () {
+		current.setDate(current.getDate() + 7);
+		render();
+	});
+	document.getElementById('todayBtn').addEventListener('click', function () {
+		current = new Date();
+		current.setHours(0, 0, 0, 0);
+		render();
+	});
+
+	render();
+})();
+</script>
+</body>
+</html>
