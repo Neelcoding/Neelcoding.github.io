@@ -69,6 +69,63 @@
 		min-width: 190px;
 		text-align: center;
 	}
+	.summary {
+		display: flex;
+		align-items: center;
+		gap: 24px;
+		background: var(--card);
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		padding: 16px 20px;
+		margin-bottom: 20px;
+		flex-wrap: wrap;
+	}
+	.summary-stat {
+		display: flex;
+		flex-direction: column;
+		line-height: 1.1;
+	}
+	.summary-stat .num {
+		font-size: 1.5rem;
+		font-weight: 700;
+	}
+	.summary-stat .lbl {
+		color: var(--muted);
+		font-size: 0.75rem;
+		margin-top: 2px;
+	}
+	.summary-progress {
+		flex: 1;
+		min-width: 180px;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+	.summary-progress .bar {
+		flex: 1;
+		height: 10px;
+		border-radius: 6px;
+		background: var(--accent-soft);
+		overflow: hidden;
+	}
+	.summary-progress .fill {
+		height: 100%;
+		background: var(--accent);
+		border-radius: 6px;
+		transition: width 0.25s ease;
+		width: 0%;
+	}
+	.summary-progress .pct {
+		font-weight: 600;
+		font-size: 0.85rem;
+		min-width: 38px;
+		text-align: right;
+	}
+	.summary-note {
+		color: var(--muted);
+		font-size: 0.82rem;
+		font-style: italic;
+	}
 	.board {
 		display: grid;
 		grid-template-columns: repeat(7, minmax(150px, 1fr));
@@ -76,6 +133,7 @@
 	}
 	@media (max-width: 900px) {
 		.board { grid-template-columns: 1fr; }
+		.summary { flex-direction: column; align-items: stretch; }
 	}
 	.day {
 		background: var(--card);
@@ -85,13 +143,21 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 260px;
+		box-shadow: 0 1px 2px rgba(20, 24, 36, 0.04);
+		transition: box-shadow 0.15s ease;
+	}
+	.day:hover {
+		box-shadow: 0 4px 14px rgba(20, 24, 36, 0.08);
 	}
 	.day.is-today {
 		background: var(--today);
 		border-color: var(--today-line);
 	}
 	.day-head {
-		margin-bottom: 10px;
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		margin-bottom: 6px;
 	}
 	.day-head .dname {
 		font-weight: 700;
@@ -101,6 +167,31 @@
 		color: var(--muted);
 		font-size: 0.8rem;
 	}
+	.day-head .count {
+		font-size: 0.72rem;
+		color: var(--muted);
+		background: var(--accent-soft);
+		border-radius: 20px;
+		padding: 2px 8px;
+		font-weight: 600;
+		flex-shrink: 0;
+	}
+	.day.is-today .day-head .count {
+		background: rgba(255,255,255,0.7);
+	}
+	.day-progress {
+		height: 5px;
+		border-radius: 4px;
+		background: var(--line);
+		overflow: hidden;
+		margin-bottom: 10px;
+	}
+	.day-progress .fill {
+		height: 100%;
+		background: var(--accent);
+		width: 0%;
+		transition: width 0.25s ease;
+	}
 	.task-list {
 		list-style: none;
 		margin: 0;
@@ -109,6 +200,10 @@
 		display: flex;
 		flex-direction: column;
 		gap: 6px;
+	}
+	.task-list.is-empty {
+		align-items: center;
+		justify-content: center;
 	}
 	.task {
 		display: flex;
@@ -179,7 +274,13 @@
 	.empty-hint {
 		color: var(--muted);
 		font-size: 0.8rem;
-		font-style: italic;
+		text-align: center;
+	}
+	.empty-hint .icon {
+		display: block;
+		font-size: 1.6rem;
+		margin-bottom: 6px;
+		opacity: 0.5;
 	}
 	footer.foot {
 		margin-top: 28px;
@@ -203,6 +304,22 @@
 			<span class="range" id="weekRange"></span>
 		</div>
 	</header>
+
+	<div class="summary" id="summary">
+		<div class="summary-stat">
+			<span class="num" id="totalCount">0</span>
+			<span class="lbl">tasks this week</span>
+		</div>
+		<div class="summary-stat">
+			<span class="num" id="doneCount">0</span>
+			<span class="lbl">completed</span>
+		</div>
+		<div class="summary-progress">
+			<div class="bar"><div class="fill" id="summaryFill"></div></div>
+			<span class="pct" id="summaryPct">0%</span>
+		</div>
+		<span class="summary-note" id="summaryNote"></span>
+	</div>
 
 	<div class="board" id="board"></div>
 
@@ -252,6 +369,20 @@
 
 	var board = document.getElementById('board');
 	var weekRange = document.getElementById('weekRange');
+	var totalCountEl = document.getElementById('totalCount');
+	var doneCountEl = document.getElementById('doneCount');
+	var summaryFill = document.getElementById('summaryFill');
+	var summaryPct = document.getElementById('summaryPct');
+	var summaryNote = document.getElementById('summaryNote');
+
+	var encourage = [
+		'Nothing planned yet — add your first task for the week.',
+		'Slow start. Pick one thing and knock it out.',
+		'Making progress — keep going.',
+		'Over halfway there. Nice work.',
+		'Almost done with the week!',
+		'Everything checked off. Great week.'
+	];
 
 	function render() {
 		var data = loadAll();
@@ -268,27 +399,44 @@
 
 		weekRange.textContent = fmtShort(days[0]) + ' – ' + fmtShort(days[6]) + ', ' + days[0].getFullYear();
 
+		var weekTotal = 0;
+		var weekDone = 0;
+
 		board.innerHTML = '';
 		days.forEach(function (d) {
 			var key = dateKey(d);
 			var tasks = data[key] || [];
 			var isToday = isSameDay(d, today);
+			var dayDone = tasks.filter(function (t) { return t.done; }).length;
+			weekTotal += tasks.length;
+			weekDone += dayDone;
 
 			var col = document.createElement('div');
 			col.className = 'day' + (isToday ? ' is-today' : '');
 
 			var head = document.createElement('div');
 			head.className = 'day-head';
-			head.innerHTML = '<div class="dname">' + dayNames[d.getDay()] + '</div><div class="ddate">' + fmtShort(d) + '</div>';
+			head.innerHTML = '<div><div class="dname">' + dayNames[d.getDay()] + '</div><div class="ddate">' + fmtShort(d) + '</div></div>' +
+				(tasks.length ? '<span class="count">' + dayDone + '/' + tasks.length + '</span>' : '');
 			col.appendChild(head);
 
+			if (tasks.length) {
+				var dprog = document.createElement('div');
+				dprog.className = 'day-progress';
+				var dfill = document.createElement('div');
+				dfill.className = 'fill';
+				dfill.style.width = Math.round((dayDone / tasks.length) * 100) + '%';
+				dprog.appendChild(dfill);
+				col.appendChild(dprog);
+			}
+
 			var list = document.createElement('ul');
-			list.className = 'task-list';
+			list.className = 'task-list' + (tasks.length === 0 ? ' is-empty' : '');
 
 			if (tasks.length === 0) {
 				var hint = document.createElement('li');
 				hint.className = 'empty-hint';
-				hint.textContent = 'No tasks yet';
+				hint.innerHTML = '<span class="icon">&#128203;</span>No tasks yet';
 				list.appendChild(hint);
 			}
 
@@ -363,6 +511,20 @@
 
 			board.appendChild(col);
 		});
+
+		var pct = weekTotal ? Math.round((weekDone / weekTotal) * 100) : 0;
+		totalCountEl.textContent = weekTotal;
+		doneCountEl.textContent = weekDone;
+		summaryFill.style.width = pct + '%';
+		summaryPct.textContent = pct + '%';
+
+		var noteIdx;
+		if (weekTotal === 0) noteIdx = 0;
+		else if (pct === 100) noteIdx = 5;
+		else if (pct >= 50) noteIdx = 3;
+		else if (pct > 0) noteIdx = 2;
+		else noteIdx = 1;
+		summaryNote.textContent = encourage[noteIdx];
 	}
 
 	document.getElementById('prevWeek').addEventListener('click', function () {
