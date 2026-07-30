@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Vial — Buy & Sell Fragrances</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="css/marketplace.css" />
+</head>
+<body>
+
+	<div id="demo-banner"></div>
+
+	<header class="site-header">
+		<div class="container">
+			<a href="index.html" class="logo">Vi<span>al</span></a>
+			<nav class="main-nav">
+				<a href="index.html" class="active">Browse</a>
+				<a href="sell.html">Sell</a>
+			</nav>
+			<div class="header-actions" id="header-actions"></div>
+		</div>
+	</header>
+
+	<section class="hero">
+		<div class="container">
+			<h1>Your next signature scent<br />is someone else's bottle.</h1>
+			<p>Buy and sell pre-owned and new fragrances — decants, discontinued releases, and full bottles, all in one place.</p>
+			<form class="search-bar" id="search-form">
+				<input type="text" id="search-input" placeholder="Search brand, scent, or notes… e.g. &ldquo;Sauvage&rdquo;" />
+				<button type="submit">Search</button>
+			</form>
+		</div>
+	</section>
+
+	<main class="container">
+		<div class="browse-layout">
+			<aside class="filters">
+				<h3>Filters</h3>
+
+				<div class="filter-group">
+					<label for="f-brand" style="font-size:12px;font-weight:600;">Brand</label>
+					<select id="f-brand">
+						<option value="">All brands</option>
+					</select>
+				</div>
+
+				<div class="filter-group">
+					<label style="font-size:12px;font-weight:600;">Gender</label>
+					<div id="f-gender"></div>
+				</div>
+
+				<div class="filter-group">
+					<label style="font-size:12px;font-weight:600;">Condition</label>
+					<select id="f-condition">
+						<option value="">Any condition</option>
+					</select>
+				</div>
+
+				<div class="filter-group">
+					<label style="font-size:12px;font-weight:600;">Scent family</label>
+					<div id="f-notes"></div>
+				</div>
+
+				<div class="filter-group">
+					<label style="font-size:12px;font-weight:600;">Price</label>
+					<div class="price-range">
+						<input type="number" id="f-min" placeholder="Min" min="0" />
+						<span>–</span>
+						<input type="number" id="f-max" placeholder="Max" min="0" />
+					</div>
+				</div>
+
+				<div class="clear-filters" id="clear-filters">Clear all filters</div>
+			</aside>
+
+			<div>
+				<div class="results-bar">
+					<div class="results-count" id="results-count">Loading listings…</div>
+					<select id="f-sort" style="width:auto;">
+						<option value="newest">Newest first</option>
+						<option value="price_asc">Price: low to high</option>
+						<option value="price_desc">Price: high to low</option>
+					</select>
+				</div>
+				<div class="listing-grid" id="listing-grid"></div>
+			</div>
+		</div>
+	</main>
+
+	<footer class="site-footer">
+		<div class="container">Vial — a fragrance marketplace prototype.</div>
+	</footer>
+
+	<script type="module" src="js/nav.js"></script>
+	<script type="module" src="js/browse.js"></script>
+</body>
+</html>
