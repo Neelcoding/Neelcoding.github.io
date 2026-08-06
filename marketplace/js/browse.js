@@ -1,5 +1,8 @@
 import { getListings, SCENT_FAMILIES, CONDITIONS } from './db.js';
 import { MOCK_LISTINGS } from './mock-data.js';
+import { iconHeart, renderThumbImage } from './icons.js';
+import { isLiked, toggleLiked, getLikedIds, getBagIds } from './wishlist.js';
+import { revealOnScroll } from './motion.js';
 
 const grid = document.getElementById('listing-grid');
 const resultsCount = document.getElementById('results-count');
@@ -10,12 +13,21 @@ const notesWrap = document.getElementById('f-notes');
 const minInput = document.getElementById('f-min');
 const maxInput = document.getElementById('f-max');
 const sortSelect = document.getElementById('f-sort');
-const searchForm = document.getElementById('search-form');
-const searchInput = document.getElementById('search-input');
+const searchForm = document.getElementById('header-search-form');
+const searchInput = document.getElementById('header-search-input');
 const clearBtn = document.getElementById('clear-filters');
+
+const SEASON_FAMILIES = {
+	spring: ['floral', 'aromatic'],
+	summer: ['citrus', 'aquatic'],
+	fall: ['woody', 'spicy'],
+	winter: ['oud', 'musky'],
+};
 
 const params = new URLSearchParams(location.search);
 if (params.get('q')) searchInput.value = params.get('q');
+const seasonParam = params.get('season');
+const viewParam = params.get('view'); // 'liked' | 'bag' | null
 
 function populateStaticFilters() {
 	const brands = [...new Set(MOCK_LISTINGS.map((l) => l.brand))].sort();
@@ -50,6 +62,13 @@ function populateStaticFilters() {
 		label.innerHTML = `<input type="checkbox" name="notes" value="${f}" /> <span style="text-transform:capitalize;">${f}</span>`;
 		notesWrap.appendChild(label);
 	});
+
+	if (seasonParam && SEASON_FAMILIES[seasonParam]) {
+		SEASON_FAMILIES[seasonParam].forEach((f) => {
+			const box = notesWrap.querySelector(`input[name="notes"][value="${f}"]`);
+			if (box) box.checked = true;
+		});
+	}
 }
 
 function currentFilters() {
@@ -64,6 +83,7 @@ function currentFilters() {
 		minPrice: minInput.value ? Number(minInput.value) : null,
 		maxPrice: maxInput.value ? Number(maxInput.value) : null,
 		sort: sortSelect.value,
+		includeSold: viewParam === 'liked' || viewParam === 'bag',
 	};
 }
 
@@ -72,24 +92,27 @@ function conditionLabel(value) {
 }
 
 function card(listing) {
-	const seller = listing.profiles;
+	const liked = isLiked(listing.id);
 	return `
-		<a class="listing-card" href="listing.html?id=${encodeURIComponent(listing.id)}">
-			<div class="thumb">
-				${listing.status === 'sold' ? '<span class="badge sold">Sold</span>' : ''}
-				${listing.images?.[0] || '🧴'}
-			</div>
-			<div class="info">
-				<div class="brand">${escapeHtml(listing.brand)}</div>
-				<div class="name">${escapeHtml(listing.name)}</div>
-				<div class="meta">
-					<span class="chip">${listing.size_ml}ml</span>
-					<span class="chip">${listing.fill_percentage}% full</span>
-					<span class="chip">${conditionLabel(listing.condition)}</span>
+		<div class="listing-card">
+			<a class="card-link" href="listing.html?id=${encodeURIComponent(listing.id)}">
+				<div class="thumb">
+					${listing.status === 'sold' ? '<span class="badge sold">Sold</span>' : listing.is_auction ? '<span class="badge">Auction</span>' : ''}
+					${renderThumbImage(listing.images?.[0])}
 				</div>
-				<div class="price">$${Number(listing.price).toFixed(0)}</div>
-			</div>
-		</a>
+				<div class="info">
+					<div class="brand">${escapeHtml(listing.brand)}</div>
+					<div class="name">${escapeHtml(listing.name)}</div>
+					<div class="meta">
+						<span class="chip">${listing.size_ml}ml</span>
+						<span class="chip">${listing.fill_percentage}% full</span>
+						<span class="chip">${conditionLabel(listing.condition)}</span>
+					</div>
+					<div class="price">$${Number(listing.price).toFixed(0)}</div>
+				</div>
+			</a>
+			<button class="like-btn ${liked ? 'active' : ''}" data-id="${listing.id}" aria-label="${liked ? 'Remove from liked' : 'Add to liked'}">${iconHeart(liked)}</button>
+		</div>
 	`;
 }
 
@@ -104,13 +127,29 @@ async function render() {
 	grid.innerHTML = '';
 	try {
 		const filters = currentFilters();
-		const listings = await getListings(filters);
-		resultsCount.textContent = `${listings.length} listing${listings.length === 1 ? '' : 's'}`;
+		let listings = await getListings(filters);
+
+		if (viewParam === 'liked') {
+			const ids = getLikedIds();
+			listings = listings.filter((l) => ids.includes(l.id));
+		} else if (viewParam === 'bag') {
+			const ids = getBagIds();
+			listings = listings.filter((l) => ids.includes(l.id));
+		}
+
+		const label = viewParam === 'liked' ? 'liked item' : viewParam === 'bag' ? 'item in bag' : 'listing';
+		resultsCount.textContent = `${listings.length} ${label}${listings.length === 1 ? '' : 's'}`;
 		if (!listings.length) {
-			grid.innerHTML = `<div class="empty-state">No fragrances match those filters yet.<br />Try widening your search.</div>`;
+			const emptyMsg = viewParam === 'liked'
+				? 'Nothing liked yet.<br />Tap the heart on any listing to save it here.'
+				: viewParam === 'bag'
+					? 'Your bag is empty.<br />Add items from a listing page.'
+					: 'No fragrances match those filters yet.<br />Try widening your search.';
+			grid.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
 			return;
 		}
 		grid.innerHTML = listings.map(card).join('');
+		revealOnScroll('.listing-card');
 	} catch (err) {
 		resultsCount.textContent = 'Something went wrong loading listings.';
 		console.error(err);
@@ -138,6 +177,18 @@ clearBtn.addEventListener('click', () => {
 	genderWrap.querySelector('input[value=""]').checked = true;
 	notesWrap.querySelectorAll('input[name="notes"]').forEach((i) => (i.checked = false));
 	render();
+});
+
+grid.addEventListener('click', (e) => {
+	const btn = e.target.closest('.like-btn');
+	if (!btn) return;
+	e.preventDefault();
+	e.stopPropagation();
+	const liked = toggleLiked(btn.dataset.id);
+	btn.classList.toggle('active', liked);
+	btn.innerHTML = iconHeart(liked);
+	btn.setAttribute('aria-label', liked ? 'Remove from liked' : 'Add to liked');
+	if (viewParam === 'liked' && !liked) render();
 });
 
 function debounce(fn, ms) {

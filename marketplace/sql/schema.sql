@@ -112,5 +112,5 @@ create policy "Owners can delete their own listing images"
 -- 2. Paste them into marketplace/js/supabase-client.js (SUPABASE_URL / SUPABASE_ANON_KEY).
 -- 3. Authentication -> Providers: email/password is enabled by default; turn off
 --    "Confirm email" while prototyping if you want signups to work immediately.
--- 4. Reload the site — the demo-mode banner disappears once real credentials are set,
+-- 4. Reload the site: the demo-mode banner disappears once real credentials are set,
 --    and all reads/writes in marketplace/js/db.js switch from mock data to Supabase.

@@ -92,6 +92,20 @@ function renderForm(user) {
 				</div>
 
 				<div class="form-row">
+					<label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+						<input type="checkbox" id="s-auction" style="width:auto;" />
+						Sell as an auction instead of a fixed price
+					</label>
+					<div class="hint">Buyers bid starting from your price above; highest bid wins when time runs out.</div>
+				</div>
+
+				<div class="form-row" id="auction-days-row" style="display:none;">
+					<label>Auction length (days) *</label>
+					<input type="number" id="s-auction-days" min="1" max="7" value="3" />
+					<div class="hint">Maximum 7 days.</div>
+				</div>
+
+				<div class="form-row">
 					<label>Scent family</label>
 					<div class="tag-select">
 						${SCENT_FAMILIES.map((f) => `<label><input type="checkbox" name="s-notes" value="${f}" style="display:none;" /><span style="text-transform:capitalize;">${f}</span></label>`).join('')}
@@ -129,6 +143,10 @@ function renderForm(user) {
 		});
 	});
 
+	document.getElementById('s-auction').addEventListener('change', (e) => {
+		document.getElementById('auction-days-row').style.display = e.target.checked ? '' : 'none';
+	});
+
 	const dropZone = document.getElementById('image-drop');
 	const fileInput = document.getElementById('s-images');
 	dropZone.addEventListener('click', () => fileInput.click());
@@ -143,6 +161,8 @@ function renderForm(user) {
 		submitBtn.disabled = true;
 		submitBtn.textContent = 'Publishing…';
 		try {
+			const isAuction = document.getElementById('s-auction').checked;
+			const auctionDays = Math.min(7, Math.max(1, Number(document.getElementById('s-auction-days').value) || 3));
 			const listing = {
 				seller_id: user.id,
 				brand: val('s-brand'),
@@ -157,6 +177,8 @@ function renderForm(user) {
 				purchase_year: val('s-year') ? Number(val('s-year')) : null,
 				scent_family: [...document.querySelectorAll('input[name="s-notes"]:checked')].map((i) => i.value),
 				description: val('s-description'),
+				is_auction: isAuction,
+				auction_ends_at: isAuction ? new Date(Date.now() + auctionDays * 86400000).toISOString() : null,
 			};
 			const created = await createListing(listing, selectedFiles);
 			location.href = `listing.html?id=${encodeURIComponent(created.id)}`;

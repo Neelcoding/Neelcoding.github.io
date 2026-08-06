@@ -3,11 +3,13 @@ import {
 	getCurrentUser,
 	getProfile,
 	updateProfile,
-	getListingsBySeller,
+	uploadAvatar,
 	signIn,
 	signUp,
 	signOut,
 } from './db.js';
+import { renderAvatar } from './icons.js';
+import { openAvatarCropper } from './avatar-cropper.js';
 
 const root = document.getElementById('account-root');
 
@@ -51,7 +53,7 @@ function renderAuthForms() {
 	});
 
 	if (!isSupabaseConfigured) {
-		showMsg('Demo mode: any email/password combo signs you in — no real account is created.', 'success');
+		showMsg("Demo mode: any email and password combo signs you in, but no real account gets created.", 'success');
 	}
 }
 
@@ -103,12 +105,18 @@ async function renderAccount() {
 	if (!user) return renderAuthForms();
 
 	const profile = (await getProfile(user.id)) || { username: user.username, display_name: '', location: '', bio: '' };
-	const listings = await getListingsBySeller(user.id);
 
 	root.innerHTML = `
 		<div class="card-panel" style="margin-bottom:24px;">
 			<h2 style="margin-top:0;">Your profile</h2>
 			<div id="form-msg"></div>
+			<div style="display:flex;align-items:center;gap:16px;margin-bottom:22px;">
+				<div id="avatar-preview">${renderAvatar(profile, 64)}</div>
+				<div>
+					<button type="button" class="btn btn-outline btn-sm" id="avatar-pick-btn">Change photo</button>
+					<input type="file" id="avatar-input" accept="image/*" style="display:none;" />
+				</div>
+			</div>
 			<form id="profile-form">
 				<div class="form-grid-2">
 					<div class="form-row">
@@ -126,16 +134,8 @@ async function renderAccount() {
 				</div>
 				<button class="btn btn-primary" type="submit">Save profile</button>
 				<a href="profile.html?id=${encodeURIComponent(user.id)}" class="btn btn-outline">View public profile</a>
+				<a href="my-listings.html" class="btn btn-outline">Manage your listings</a>
 			</form>
-		</div>
-
-		<div class="card-panel" style="margin-bottom:24px;">
-			<div style="display:flex;align-items:center;justify-content:space-between;">
-				<h2 style="margin:0;">Your listings (${listings.length})</h2>
-				<a href="sell.html" class="btn btn-gold btn-sm">+ New listing</a>
-			</div>
-			<hr class="divider" />
-			${listings.length ? listings.map(myListingRow).join('') : `<p style="color:var(--ink-soft);">You haven't listed anything yet.</p>`}
 		</div>
 
 		<button class="btn btn-outline" id="signout-btn">Sign out</button>
@@ -159,17 +159,32 @@ async function renderAccount() {
 		await signOut();
 		location.reload();
 	});
-}
 
-function myListingRow(listing) {
-	return `
-		<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);">
-			<a href="listing.html?id=${encodeURIComponent(listing.id)}" style="font-weight:600;">
-				${escapeHtml(listing.brand)} ${escapeHtml(listing.name)}
-			</a>
-			<span class="chip">${listing.status === 'sold' ? 'Sold' : 'Available'} · $${Number(listing.price).toFixed(0)}</span>
-		</div>
-	`;
+	document.getElementById('avatar-pick-btn').addEventListener('click', () => {
+		document.getElementById('avatar-input').click();
+	});
+
+	document.getElementById('avatar-input').addEventListener('change', async (e) => {
+		const file = e.target.files[0];
+		e.target.value = '';
+		if (!file) return;
+		const cropped = await openAvatarCropper(file);
+		if (!cropped) return;
+		const pickBtn = document.getElementById('avatar-pick-btn');
+		pickBtn.disabled = true;
+		pickBtn.textContent = 'Uploading…';
+		try {
+			const avatarFile = new File([cropped], 'avatar.jpg', { type: 'image/jpeg' });
+			const url = await uploadAvatar(user.id, avatarFile);
+			document.getElementById('avatar-preview').innerHTML = renderAvatar({ ...profile, avatar_url: url }, 64);
+			document.dispatchEvent(new CustomEvent('fm:counts-changed'));
+			showMsg('Profile photo updated.', 'success');
+		} catch (err) {
+			showMsg(err.message || 'Could not upload photo.', 'error');
+		}
+		pickBtn.disabled = false;
+		pickBtn.textContent = 'Change photo';
+	});
 }
 
 renderAccount();

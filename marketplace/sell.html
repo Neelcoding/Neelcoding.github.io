@@ -3,9 +3,11 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>List an item — Vial</title>
+	<title>List an item - Vial</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+	<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 	<link rel="stylesheet" href="css/marketplace.css" />
 </head>
 <body>
@@ -15,6 +17,10 @@
 	<header class="site-header">
 		<div class="container">
 			<a href="index.html" class="logo">Vi<span>al</span></a>
+			<form class="header-search" id="header-search-form">
+				<input type="text" id="header-search-input" placeholder="Search brand, scent, or notes…" />
+				<button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+			</form>
 			<nav class="main-nav">
 				<a href="index.html">Browse</a>
 				<a href="sell.html" class="active">Sell</a>
@@ -26,7 +32,7 @@
 	<main class="form-page" id="sell-root"></main>
 
 	<footer class="site-footer">
-		<div class="container">Vial — a fragrance marketplace prototype.</div>
+		<div class="container footer-inner"><span class="logo footer-logo">Vi<span>al</span></span><span class="footer-tag">Fragrance that changes hands, not a landfill trip.</span></div>
 	</footer>
 
 	<script type="module" src="js/nav.js"></script>

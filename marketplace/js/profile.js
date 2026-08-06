@@ -1,4 +1,5 @@
 import { getProfile, getListingsBySeller, CONDITIONS } from './db.js';
+import { renderThumbImage, renderAvatar } from './icons.js';
 
 const root = document.getElementById('profile-root');
 const params = new URLSearchParams(location.search);
@@ -10,10 +11,6 @@ function escapeHtml(str) {
 	return div.innerHTML;
 }
 
-function initials(name) {
-	return (name || '?').trim().slice(0, 1).toUpperCase();
-}
-
 function conditionLabel(value) {
 	return CONDITIONS.find((c) => c.value === value)?.label || value;
 }
@@ -23,7 +20,7 @@ function card(listing) {
 		<a class="listing-card" href="listing.html?id=${encodeURIComponent(listing.id)}">
 			<div class="thumb">
 				${listing.status === 'sold' ? '<span class="badge sold">Sold</span>' : ''}
-				${listing.images?.[0] || '🧴'}
+				${renderThumbImage(listing.images?.[0])}
 			</div>
 			<div class="info">
 				<div class="brand">${escapeHtml(listing.brand)}</div>
@@ -54,7 +51,7 @@ async function render() {
 
 	root.innerHTML = `
 		<div class="profile-header">
-			<div class="avatar-lg">${initials(profile.display_name || profile.username)}</div>
+			${renderAvatar(profile, 84)}
 			<div>
 				<h1>${escapeHtml(profile.display_name || profile.username)}</h1>
 				<div class="profile-meta">@${escapeHtml(profile.username)} ${profile.location ? '· ' + escapeHtml(profile.location) : ''}</div>
