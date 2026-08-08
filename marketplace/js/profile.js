@@ -42,7 +42,7 @@ async function render() {
 	}
 	const profile = await getProfile(id);
 	if (!profile) {
-		root.innerHTML = `<div class="empty-state">This seller doesn't exist. <a href="index.html">Back to browsing.</a></div>`;
+		root.innerHTML = `<div class="empty-state">This seller doesn't exist. <a href="browse.html">Back to browsing.</a></div>`;
 		return;
 	}
 	const listings = await getListingsBySeller(id);

@@ -22,7 +22,7 @@
 				<button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
 			</form>
 			<nav class="main-nav">
-				<a href="index.html" class="active">Browse</a>
+				<a href="browse.html">Browse</a>
 				<a href="sell.html">Sell</a>
 			</nav>
 			<div class="header-actions" id="header-actions"></div>
@@ -31,10 +31,9 @@
 
 	<section class="hero">
 		<div class="hero-copy">
-			<p class="hero-kicker">For people who own more bottles than they'll ever finish</p>
 			<h1>Find your signature scent.</h1>
 			<div class="hero-cta-row">
-				<a href="#listing-grid" class="btn btn-gold btn-lg">Browse the collection</a>
+				<a href="browse.html" class="btn btn-gold btn-lg">Browse the collection</a>
 				<a href="sell.html" class="btn btn-outline btn-lg">Start selling</a>
 			</div>
 		</div>
@@ -43,66 +42,21 @@
 		</figure>
 	</section>
 
-	<main class="container">
-		<div class="browse-layout">
-			<aside class="filters">
-				<h3>Filters</h3>
-
-				<div class="filter-group">
-					<label for="f-brand" style="font-size:12px;font-weight:600;">Brand</label>
-					<select id="f-brand">
-						<option value="">All brands</option>
-					</select>
-				</div>
-
-				<div class="filter-group">
-					<label style="font-size:12px;font-weight:600;">Gender</label>
-					<div id="f-gender"></div>
-				</div>
-
-				<div class="filter-group">
-					<label style="font-size:12px;font-weight:600;">Condition</label>
-					<select id="f-condition">
-						<option value="">Any condition</option>
-					</select>
-				</div>
-
-				<div class="filter-group">
-					<label style="font-size:12px;font-weight:600;">Scent family</label>
-					<div id="f-notes"></div>
-				</div>
-
-				<div class="filter-group">
-					<label style="font-size:12px;font-weight:600;">Price</label>
-					<div class="price-range">
-						<input type="number" id="f-min" placeholder="Min" min="0" />
-						<span>–</span>
-						<input type="number" id="f-max" placeholder="Max" min="0" />
-					</div>
-				</div>
-
-				<div class="clear-filters" id="clear-filters">Clear all filters</div>
-			</aside>
-
-			<div>
-				<div class="results-bar">
-					<div class="results-count" id="results-count">Loading listings…</div>
-					<select id="f-sort" style="width:auto;">
-						<option value="newest">Newest first</option>
-						<option value="price_asc">Price: low to high</option>
-						<option value="price_desc">Price: high to low</option>
-					</select>
-				</div>
-				<div class="listing-grid" id="listing-grid"></div>
+	<section class="recent-section">
+		<div class="container">
+			<div class="recent-header">
+				<h2 id="recent-title">Recently viewed</h2>
+				<p class="recent-sub" id="recent-sub">Picking up where you left off.</p>
 			</div>
+			<div class="listing-grid" id="recent-grid"></div>
 		</div>
-	</main>
+	</section>
 
 	<footer class="site-footer">
 		<div class="container footer-inner"><span class="logo footer-logo">Vi<span>al</span></span><span class="footer-tag">Fragrance that changes hands, not a landfill trip.</span></div>
 	</footer>
 
 	<script type="module" src="js/nav.js"></script>
-	<script type="module" src="js/browse.js"></script>
+	<script type="module" src="js/home.js"></script>
 </body>
 </html>

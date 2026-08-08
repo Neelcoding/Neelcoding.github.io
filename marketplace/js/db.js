@@ -227,6 +227,22 @@ export async function getListingById(id) {
 	return listing ? attachProfile(listing) : null;
 }
 
+export async function getListingsByIds(ids) {
+	if (!ids?.length) return [];
+	if (isSupabaseConfigured) {
+		const supabase = await getSupabase();
+		const { data, error } = await supabase
+			.from('listings')
+			.select('*, profiles(id, username, display_name, location, avatar_url)')
+			.in('id', ids);
+		if (error) throw error;
+		return data || [];
+	}
+	return [...MOCK_LISTINGS, ...localListings()]
+		.filter((l) => ids.includes(l.id))
+		.map(attachProfile);
+}
+
 export async function getListingsBySeller(sellerId) {
 	if (isSupabaseConfigured) {
 		const supabase = await getSupabase();

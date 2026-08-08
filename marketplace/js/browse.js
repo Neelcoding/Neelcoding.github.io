@@ -1,8 +1,8 @@
 import { getListings, SCENT_FAMILIES, CONDITIONS } from './db.js';
 import { MOCK_LISTINGS } from './mock-data.js';
-import { iconHeart, renderThumbImage } from './icons.js';
-import { isLiked, toggleLiked, getLikedIds, getBagIds } from './wishlist.js';
+import { getLikedIds, getBagIds } from './wishlist.js';
 import { revealOnScroll } from './motion.js';
+import { renderListingCard, wireLikeButtons } from './listing-card.js';
 
 const grid = document.getElementById('listing-grid');
 const resultsCount = document.getElementById('results-count');
@@ -87,41 +87,6 @@ function currentFilters() {
 	};
 }
 
-function conditionLabel(value) {
-	return CONDITIONS.find((c) => c.value === value)?.label || value;
-}
-
-function card(listing) {
-	const liked = isLiked(listing.id);
-	return `
-		<div class="listing-card">
-			<a class="card-link" href="listing.html?id=${encodeURIComponent(listing.id)}">
-				<div class="thumb">
-					${listing.status === 'sold' ? '<span class="badge sold">Sold</span>' : listing.is_auction ? '<span class="badge">Auction</span>' : ''}
-					${renderThumbImage(listing.images?.[0])}
-				</div>
-				<div class="info">
-					<div class="brand">${escapeHtml(listing.brand)}</div>
-					<div class="name">${escapeHtml(listing.name)}</div>
-					<div class="meta">
-						<span class="chip">${listing.size_ml}ml</span>
-						<span class="chip">${listing.fill_percentage}% full</span>
-						<span class="chip">${conditionLabel(listing.condition)}</span>
-					</div>
-					<div class="price">$${Number(listing.price).toFixed(0)}</div>
-				</div>
-			</a>
-			<button class="like-btn ${liked ? 'active' : ''}" data-id="${listing.id}" aria-label="${liked ? 'Remove from liked' : 'Add to liked'}">${iconHeart(liked)}</button>
-		</div>
-	`;
-}
-
-function escapeHtml(str) {
-	const div = document.createElement('div');
-	div.textContent = str ?? '';
-	return div.innerHTML;
-}
-
 async function render() {
 	resultsCount.textContent = 'Loading listings…';
 	grid.innerHTML = '';
@@ -148,7 +113,7 @@ async function render() {
 			grid.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
 			return;
 		}
-		grid.innerHTML = listings.map(card).join('');
+		grid.innerHTML = listings.map(renderListingCard).join('');
 		revealOnScroll('.listing-card');
 	} catch (err) {
 		resultsCount.textContent = 'Something went wrong loading listings.';
@@ -179,15 +144,7 @@ clearBtn.addEventListener('click', () => {
 	render();
 });
 
-grid.addEventListener('click', (e) => {
-	const btn = e.target.closest('.like-btn');
-	if (!btn) return;
-	e.preventDefault();
-	e.stopPropagation();
-	const liked = toggleLiked(btn.dataset.id);
-	btn.classList.toggle('active', liked);
-	btn.innerHTML = iconHeart(liked);
-	btn.setAttribute('aria-label', liked ? 'Remove from liked' : 'Add to liked');
+wireLikeButtons(grid, (id, liked) => {
 	if (viewParam === 'liked' && !liked) render();
 });
 

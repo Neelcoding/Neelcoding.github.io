@@ -24,10 +24,10 @@ async function renderHeaderActions() {
 
 	el.innerHTML = `
 		<a href="sell.html" class="btn btn-gold btn-sm"><span class="label-full">+ List an item</span><span class="label-short">+ Sell</span></a>
-		<a href="index.html?view=liked" class="icon-link" aria-label="Liked items" title="Liked">
+		<a href="browse.html?view=liked" class="icon-link" aria-label="Liked items" title="Liked">
 			${iconHeart(false)}${likedCount ? `<span class="icon-count">${likedCount}</span>` : ''}
 		</a>
-		<a href="index.html?view=bag" class="icon-link" aria-label="Bag" title="Bag">
+		<a href="browse.html?view=bag" class="icon-link" aria-label="Bag" title="Bag">
 			${ICON_BAG}${bagCount ? `<span class="icon-count">${bagCount}</span>` : ''}
 		</a>
 		${user ? `
@@ -90,7 +90,7 @@ function wireHeaderSearch() {
 	form.addEventListener('submit', (e) => {
 		e.preventDefault();
 		const q = document.getElementById('header-search-input').value.trim();
-		location.href = 'index.html' + (q ? `?q=${encodeURIComponent(q)}` : '');
+		location.href = 'browse.html' + (q ? `?q=${encodeURIComponent(q)}` : '');
 	});
 }
 

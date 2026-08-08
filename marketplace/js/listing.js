@@ -12,6 +12,7 @@ import { iconHeart, ICON_BAG, renderThumbImage, renderAvatar } from './icons.js'
 import { isLiked, toggleLiked, isInBag, toggleBag } from './wishlist.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from './supabase-client.js';
 import { revealOnScroll } from './motion.js';
+import { recordView } from './recently-viewed.js';
 
 const root = document.getElementById('listing-root');
 const params = new URLSearchParams(location.search);
@@ -51,12 +52,13 @@ async function render() {
 	}
 	const listing = await getListingById(id);
 	if (!listing) {
-		root.innerHTML = `<div class="empty-state">This listing doesn't exist or was removed. <a href="index.html">Back to browsing.</a></div>`;
+		root.innerHTML = `<div class="empty-state">This listing doesn't exist or was removed. <a href="browse.html">Back to browsing.</a></div>`;
 		return;
 	}
 	const seller = listing.profiles || {};
 	const currentUser = await getCurrentUser();
 	const isOwner = currentUser && currentUser.id === listing.seller_id;
+	if (!isOwner) recordView(listing.id);
 	const images = listing.images?.length ? listing.images : [null];
 	const bids = listing.is_auction ? await getBids(listing.id) : [];
 
@@ -76,6 +78,7 @@ async function render() {
 					$${Number(listing.price).toFixed(0)}${listing.is_auction ? ' <span style="font-size:14px;color:var(--ink-soft);font-weight:500;">starting price</span>' : ''}
 					${listing.status === 'sold' ? '<span class="badge sold" style="position:static;margin-left:10px;">Sold</span>' : ''}
 				</div>
+				${buyNowFeeNote(listing)}
 
 				${listing.is_auction ? auctionPanel(listing, bids, currentUser) : ''}
 
@@ -291,6 +294,14 @@ async function startCheckout(listing, button) {
 		`);
 		closeableModal(overlay);
 	}
+}
+
+function buyNowFeeNote(listing) {
+	const canBuyNow = isSupabaseConfigured && !listing.is_auction && listing.status !== 'sold';
+	if (!canBuyNow) return '';
+	const fee = Number(listing.price) * 0.05;
+	const total = Number(listing.price) + fee;
+	return `<div class="hint" style="margin:-10px 0 20px;">+ 5% processing fee ($${fee.toFixed(2)}) at checkout, $${total.toFixed(2)} total</div>`;
 }
 
 function boxLabel(value) {

@@ -135,11 +135,7 @@ function renderForm(user) {
 		label.addEventListener('click', (e) => {
 			e.preventDefault();
 			const input = label.querySelector('input');
-			input.checked = !input.checked;
-			label.classList.toggle('active', input.checked);
-			label.style.background = input.checked ? 'var(--ink)' : '';
-			label.style.color = input.checked ? 'var(--cream)' : '';
-			label.style.borderColor = input.checked ? 'var(--ink)' : '';
+			setTagActive(input, !input.checked);
 		});
 	});
 
@@ -207,6 +203,15 @@ function renderPreviews() {
 function showMsg(text, type) {
 	const el = document.getElementById('form-msg');
 	if (el) el.innerHTML = `<div class="form-msg ${type}">${escapeHtml(text)}</div>`;
+}
+
+function setTagActive(input, active) {
+	input.checked = active;
+	const label = input.closest('label');
+	label.classList.toggle('active', active);
+	label.style.background = active ? 'var(--ink)' : '';
+	label.style.color = active ? 'var(--cream)' : '';
+	label.style.borderColor = active ? 'var(--ink)' : '';
 }
 
 (async function init() {

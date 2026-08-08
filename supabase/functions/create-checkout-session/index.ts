@@ -1,10 +1,15 @@
 // Creates a Stripe Checkout session for a single listing and returns its URL.
+// Charges a 5% processing fee on top of the listing price, shown to the buyer
+// as its own line item. There's no seller-payout system (Stripe Connect) in
+// this project yet, so 100% of every charge, item price and fee alike, already
+// settles into the one connected Stripe account behind STRIPE_SECRET_KEY.
 // Deploy via the Supabase Dashboard: Edge Functions -> Deploy a new function -> "Via Editor".
 // Requires a Supabase secret named STRIPE_SECRET_KEY (Edge Functions -> Secrets).
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!;
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
+const PROCESSING_FEE_RATE = 0.05;
 
 const corsHeaders = {
 	'Access-Control-Allow-Origin': '*',
@@ -31,15 +36,23 @@ Deno.serve(async (req) => {
 		if (!listing) return json({ error: 'Listing not found' }, 404);
 		if (listing.status === 'sold') return json({ error: 'This listing is already sold' }, 409);
 
+		const priceCents = Math.round(Number(listing.price) * 100);
+		const feeCents = Math.round(priceCents * PROCESSING_FEE_RATE);
+
 		const body = new URLSearchParams({
 			mode: 'payment',
 			success_url: `${origin}/listing.html?id=${listing.id}&purchase=success`,
 			cancel_url: `${origin}/listing.html?id=${listing.id}&purchase=cancelled`,
 			'line_items[0][quantity]': '1',
 			'line_items[0][price_data][currency]': 'usd',
-			'line_items[0][price_data][unit_amount]': String(Math.round(Number(listing.price) * 100)),
+			'line_items[0][price_data][unit_amount]': String(priceCents),
 			'line_items[0][price_data][product_data][name]': `${listing.brand} ${listing.name}`,
+			'line_items[1][quantity]': '1',
+			'line_items[1][price_data][currency]': 'usd',
+			'line_items[1][price_data][unit_amount]': String(feeCents),
+			'line_items[1][price_data][product_data][name]': 'Processing fee (5%)',
 			'metadata[listing_id]': listing.id,
+			'metadata[processing_fee_cents]': String(feeCents),
 		});
 
 		const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
