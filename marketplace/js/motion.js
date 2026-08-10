@@ -22,18 +22,16 @@ export function heroEntrance() {
 	if (!gsapReady() || prefersReducedMotion()) return;
 	const h1 = document.querySelector('.hero h1');
 	if (!h1) return;
-	const sub = document.querySelector('.hero-sub');
 	const cta = document.querySelector('.hero-copy .btn');
 	const facts = document.querySelector('.hero-facts');
 	const photo = document.querySelector('.hero-photo');
 
-	const targets = [h1, sub, cta, facts, photo].filter(Boolean);
+	const targets = [h1, cta, facts, photo].filter(Boolean);
 	gsap.set(targets, { opacity: 0, y: 26 });
 	setTimeout(() => forceVisible(targets), 1800);
 
 	const tl = gsap.timeline({ defaults: { duration: 0.8, ease: 'power3.out' } });
 	tl.to(h1, { opacity: 1, y: 0 });
-	if (sub) tl.to(sub, { opacity: 1, y: 0 }, '-=0.6');
 	if (cta) tl.to(cta, { opacity: 1, y: 0 }, '-=0.6');
 	if (facts) tl.to(facts, { opacity: 1, y: 0 }, '-=0.55');
 	if (photo) tl.to(photo, { opacity: 1, y: 0, duration: 1 }, '-=0.9');

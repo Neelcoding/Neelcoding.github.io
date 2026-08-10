@@ -364,13 +364,8 @@ textarea:focus-visible,
 .hero h1 {
 	font-size: clamp(2.4rem, 3.8vw, 3.4rem);
 	line-height: 1.08;
-	margin: 0 0 14px;
-}
-.hero-sub {
-	color: var(--ink-soft);
-	font-size: 17px;
-	margin: 0 0 28px;
-	max-width: 46ch;
+	/* Sits directly above the CTA now that the subcopy is gone. */
+	margin: 0 0 32px;
 }
 .btn-lg { padding: 14px 34px; font-size: 15px; }
 
