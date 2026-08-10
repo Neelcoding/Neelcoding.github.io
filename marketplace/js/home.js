@@ -7,6 +7,48 @@ const grid = document.getElementById('recent-grid');
 const titleEl = document.getElementById('recent-title');
 const subEl = document.getElementById('recent-sub');
 
+// Hero Buy/Sell toggle. Swaps the pitch rather than just relabelling a link,
+// so the Sell side actually speaks to sellers.
+const HERO_MODES = {
+	buy: {
+		title: 'Find your signature scent.',
+		sub: "Bottles people stopped reaching for, passed on instead of poured out.",
+		cta: 'Shop now',
+		href: 'browse.html',
+	},
+	sell: {
+		title: 'Move on what you never wear.',
+		sub: 'List a bottle in a couple of minutes. Set a price or let it run as an auction.',
+		cta: 'Start selling',
+		href: 'sell.html',
+	},
+};
+
+function wireModeToggle() {
+	const buyBtn = document.getElementById('mode-buy');
+	const sellBtn = document.getElementById('mode-sell');
+	const title = document.getElementById('hero-title');
+	const sub = document.getElementById('hero-sub');
+	const cta = document.getElementById('hero-cta');
+	if (!buyBtn || !sellBtn || !title || !sub || !cta) return;
+
+	const apply = (mode) => {
+		const m = HERO_MODES[mode];
+		title.textContent = m.title;
+		sub.textContent = m.sub;
+		cta.textContent = m.cta;
+		cta.href = m.href;
+		const buying = mode === 'buy';
+		buyBtn.classList.toggle('active', buying);
+		sellBtn.classList.toggle('active', !buying);
+		buyBtn.setAttribute('aria-selected', String(buying));
+		sellBtn.setAttribute('aria-selected', String(!buying));
+	};
+
+	buyBtn.addEventListener('click', () => apply('buy'));
+	sellBtn.addEventListener('click', () => apply('sell'));
+}
+
 async function render() {
 	if (!grid) return;
 
@@ -41,4 +83,5 @@ async function render() {
 }
 
 if (grid) wireLikeButtons(grid);
+wireModeToggle();
 render();

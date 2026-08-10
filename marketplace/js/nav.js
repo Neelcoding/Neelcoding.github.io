@@ -5,6 +5,32 @@ import { iconHeart, ICON_BAG, ICON_MESSAGE, renderAvatar } from './icons.js';
 import { getLikedIds, getBagIds } from './wishlist.js';
 import { heroEntrance } from './motion.js';
 
+// Category row under the main header. Every entry maps to a filter browse.js
+// actually understands, so none of these are decorative.
+const CATEGORIES = [
+	{ label: 'All', href: 'browse.html' },
+	{ label: 'Men', href: 'browse.html?gender=men' },
+	{ label: 'Women', href: 'browse.html?gender=women' },
+	{ label: 'Unisex', href: 'browse.html?gender=unisex' },
+	{ label: 'Auctions', href: 'browse.html?auction=1' },
+	{ label: 'Under $50', href: 'browse.html?max=50' },
+	{ label: 'Sell', href: 'sell.html', accent: true },
+];
+
+function renderCategoryNav() {
+	const el = document.getElementById('category-nav');
+	if (!el) return;
+	const page = location.pathname.split('/').pop() || 'index.html';
+	const search = location.search;
+
+	el.innerHTML = `<nav class="container category-row">${CATEGORIES.map((c) => {
+		const [cPage, cQuery = ''] = c.href.split('?');
+		// "All" should only light up on a bare browse page, not every filtered view.
+		const isActive = cPage === page && (cQuery ? search === `?${cQuery}` : !search);
+		return `<a href="${c.href}" class="${isActive ? 'active' : ''}${c.accent ? ' accent' : ''}">${c.label}</a>`;
+	}).join('')}</nav>`;
+}
+
 function renderDemoBanner() {
 	const el = document.getElementById('demo-banner');
 	if (!el) return;
@@ -95,6 +121,7 @@ function wireHeaderSearch() {
 }
 
 renderDemoBanner();
+renderCategoryNav();
 renderHeaderActions();
 wireHeaderSearch();
 heroEntrance();

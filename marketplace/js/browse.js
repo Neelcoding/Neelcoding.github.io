@@ -28,6 +28,10 @@ const params = new URLSearchParams(location.search);
 if (params.get('q')) searchInput.value = params.get('q');
 const seasonParam = params.get('season');
 const viewParam = params.get('view'); // 'liked' | 'bag' | null
+const genderParam = params.get('gender'); // 'men' | 'women' | 'unisex'
+const familyParam = params.get('family'); // comma-separated scent families
+const maxParam = params.get('max'); // price ceiling
+const auctionParam = params.get('auction') === '1';
 
 function populateStaticFilters() {
 	const brands = [...new Set(MOCK_LISTINGS.map((l) => l.brand))].sort();
@@ -63,12 +67,26 @@ function populateStaticFilters() {
 		notesWrap.appendChild(label);
 	});
 
+	// Reflect any URL filters in the sidebar controls rather than filtering
+	// invisibly, so the state is visible and "Clear all filters" still works.
 	if (seasonParam && SEASON_FAMILIES[seasonParam]) {
-		SEASON_FAMILIES[seasonParam].forEach((f) => {
-			const box = notesWrap.querySelector(`input[name="notes"][value="${f}"]`);
-			if (box) box.checked = true;
-		});
+		SEASON_FAMILIES[seasonParam].forEach((f) => checkFamily(f));
 	}
+	if (genderParam) {
+		const radio = genderWrap.querySelector(`input[name="gender"][value="${genderParam}"]`);
+		if (radio) radio.checked = true;
+	}
+	if (familyParam) {
+		familyParam.split(',').forEach((f) => checkFamily(f.trim()));
+	}
+	if (maxParam && !Number.isNaN(Number(maxParam))) {
+		maxInput.value = Number(maxParam);
+	}
+}
+
+function checkFamily(family) {
+	const box = notesWrap.querySelector(`input[name="notes"][value="${family}"]`);
+	if (box) box.checked = true;
 }
 
 function currentFilters() {
@@ -101,15 +119,24 @@ async function render() {
 			const ids = getBagIds();
 			listings = listings.filter((l) => ids.includes(l.id));
 		}
+		if (auctionParam) listings = listings.filter((l) => l.is_auction);
 
-		const label = viewParam === 'liked' ? 'liked item' : viewParam === 'bag' ? 'item in bag' : 'listing';
+		const label = viewParam === 'liked'
+			? 'liked item'
+			: viewParam === 'bag'
+				? 'item in bag'
+				: auctionParam
+					? 'auction'
+					: 'listing';
 		resultsCount.textContent = `${listings.length} ${label}${listings.length === 1 ? '' : 's'}`;
 		if (!listings.length) {
 			const emptyMsg = viewParam === 'liked'
 				? 'Nothing liked yet.<br />Tap the heart on any listing to save it here.'
 				: viewParam === 'bag'
 					? 'Your bag is empty.<br />Add items from a listing page.'
-					: 'No fragrances match those filters yet.<br />Try widening your search.';
+					: auctionParam
+						? 'No live auctions right now.<br /><a href="browse.html">See everything instead.</a>'
+						: 'No fragrances match those filters yet.<br />Try widening your search.';
 			grid.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
 			return;
 		}

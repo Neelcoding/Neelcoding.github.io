@@ -89,12 +89,38 @@ textarea:focus-visible,
 	border-bottom: 1px solid var(--line);
 }
 
-.site-header .container {
+.site-header .header-main {
 	display: flex;
 	align-items: center;
-	height: 68px;
-	gap: 20px;
+	height: 72px;
+	gap: 24px;
 }
+
+/* Category row sits under the main header bar, both inside the sticky area. */
+.header-categories {
+	border-top: 1px solid var(--line);
+}
+.category-row {
+	display: flex;
+	align-items: center;
+	gap: 26px;
+	height: 46px;
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+.category-row::-webkit-scrollbar { display: none; }
+.category-row a {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--ink);
+	white-space: nowrap;
+	padding: 4px 0;
+	border-bottom: 2px solid transparent;
+	transition: border-color 0.15s ease;
+}
+.category-row a:hover { border-bottom-color: var(--line); }
+.category-row a.active { border-bottom-color: var(--gold); }
+.category-row a.accent { color: var(--gold-dark); font-weight: 700; }
 
 /* The wordmark keeps its original Playfair Display cut; only body headings
    moved to Poiret One. */
@@ -109,23 +135,31 @@ textarea:focus-visible,
 
 .logo span { color: var(--gold-dark); }
 
+/* Prominent pill search: the primary way into the catalogue, so it takes the
+   centre of the header rather than sitting as a thin underline. */
 .header-search {
 	flex: 1;
-	max-width: 380px;
+	max-width: 620px;
+	margin: 0 auto;
 	display: flex;
 	align-items: center;
-	background: transparent;
-	border-bottom: 1px solid var(--line);
-	transition: border-color 0.2s ease;
+	flex-direction: row-reverse;
+	gap: 6px;
+	background: var(--card);
+	border: 1.5px solid var(--ink);
+	border-radius: var(--radius-pill);
+	padding: 0 18px;
+	height: 46px;
+	transition: box-shadow 0.15s ease;
 }
-.header-search:focus-within { border-bottom-color: var(--gold-dark); }
+.header-search:focus-within { box-shadow: 0 0 0 3px var(--cream-dark); }
 .header-search input {
 	flex: 1;
 	min-width: 0;
 	border: none;
 	background: transparent;
-	padding: 8px 4px;
-	font-size: 13.5px;
+	padding: 0;
+	font-size: 15px;
 	outline: none;
 	font-family: inherit;
 	color: var(--ink);
@@ -134,34 +168,15 @@ textarea:focus-visible,
 .header-search button {
 	border: none;
 	background: transparent;
-	color: var(--ink-soft);
-	padding: 0 2px 0 8px;
-	height: 100%;
+	color: var(--ink);
+	padding: 0;
 	display: flex;
 	align-items: center;
 	cursor: pointer;
-}
-.header-search button:hover { color: var(--gold-dark); }
-
-.main-nav {
-	display: flex;
-	align-items: center;
-	gap: 22px;
 	flex-shrink: 0;
 }
-
-.main-nav a {
-	font-size: 14px;
-	font-weight: 500;
-	color: var(--ink-soft);
-	padding: 6px 0;
-	border-bottom: 2px solid transparent;
-}
-
-.main-nav a:hover, .main-nav a.active {
-	color: var(--ink);
-	border-bottom-color: var(--gold);
-}
+.header-search button svg { width: 20px; height: 20px; }
+.header-search button:hover { color: var(--gold-dark); }
 
 .header-actions {
 	display: flex;
@@ -326,42 +341,92 @@ textarea:focus-visible,
 
 /* ---------- Hero ---------- */
 .hero {
+	background: linear-gradient(180deg, var(--cream) 0%, var(--cream-dark) 100%);
+	padding: 56px 0 64px;
+}
+.hero-grid {
 	display: grid;
-	grid-template-columns: minmax(320px, 560px) 1fr;
-	align-items: stretch;
-	min-height: 600px;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	align-items: center;
+	gap: 48px;
 }
 .hero-copy {
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
-	padding: 40px 40px 40px max(32px, calc((100vw - 1440px) / 2 + 32px));
-}
-.hero h1 {
-	font-size: clamp(2.6rem, 4.2vw, 3.75rem);
-	line-height: 1.05;
-	letter-spacing: -0.01em;
-	margin: 0 0 32px;
+	align-items: flex-start;
 }
 
-.hero-cta-row {
-	display: flex;
-	align-items: center;
-	gap: 14px;
+/* Segmented Buy/Sell control */
+.mode-toggle {
+	display: inline-flex;
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: var(--radius-pill);
+	padding: 4px;
+	margin-bottom: 26px;
 }
-.btn-lg { padding: 14px 30px; font-size: 15px; }
+.mode-toggle button {
+	border: none;
+	background: transparent;
+	font-family: inherit;
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--ink-soft);
+	padding: 9px 30px;
+	border-radius: var(--radius-pill);
+	cursor: pointer;
+	transition: background 0.18s ease, color 0.18s ease;
+}
+.mode-toggle button.active {
+	background: var(--cream-dark);
+	color: var(--ink);
+}
+
+.hero h1 {
+	font-size: clamp(2.4rem, 3.8vw, 3.4rem);
+	line-height: 1.08;
+	margin: 0 0 14px;
+}
+.hero-sub {
+	color: var(--ink-soft);
+	font-size: 17px;
+	margin: 0 0 28px;
+	max-width: 46ch;
+}
+.btn-lg { padding: 14px 34px; font-size: 15px; }
+
+/* Fact tiles. Deliberately qualitative: this project has no real marketplace
+   volume to quote, so inventing "49M+ items" numbers is not on the table. */
+.hero-facts {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+	margin-top: 44px;
+	width: 100%;
+}
+.fact {
+	background: rgba(255, 255, 255, 0.55);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	padding: 16px;
+}
+.fact svg { width: 22px; height: 22px; color: var(--gold-dark); margin-bottom: 10px; }
+.fact strong { display: block; font-size: 14px; margin-bottom: 2px; }
+.fact span { font-size: 13px; color: var(--ink-soft); }
 
 .hero-photo {
 	position: relative;
 	margin: 0;
 	max-width: none;
-	height: 100%;
-	min-height: 360px;
+	border-radius: var(--radius);
 	overflow: hidden;
+	transform: rotate(1.5deg);
+	box-shadow: var(--shadow-lift);
 }
 .hero-photo img {
 	width: 100%;
 	height: 100%;
+	max-height: 520px;
 	object-fit: cover;
 	display: block;
 }
@@ -979,18 +1044,17 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
 	.browse-layout { grid-template-columns: 1fr; }
 	.filters { position: static; }
 	.listing-detail { grid-template-columns: 1fr; gap: 28px; }
-	.main-nav { gap: 16px; }
 	.form-grid-2 { grid-template-columns: 1fr; }
 	.messages-layout { grid-template-columns: 1fr; height: auto; }
 	.conversation-list { max-height: 220px; }
 	.thread-pane { height: 480px; }
-	.hero { grid-template-columns: 1fr; min-height: 0; }
-	.hero-copy { padding: 48px 24px 32px; }
-	.hero-photo { height: 340px; }
+	.hero-grid { grid-template-columns: 1fr; gap: 32px; }
+	.hero-photo { order: -1; transform: none; }
+	.hero-photo img { max-height: 300px; }
 }
 
 @media (max-width: 640px) {
-	.site-header .container {
+	.site-header .header-main {
 		flex-wrap: wrap;
 		height: auto;
 		padding-top: 10px;
@@ -998,18 +1062,20 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
 		row-gap: 8px;
 	}
 	.logo { order: 1; }
-	/* Nav sits beside the logo on its own row so Browse stays reachable on
-	   phones. Two links don't justify a hamburger. */
-	.main-nav { order: 1; gap: 18px; margin-left: 6px; }
-	.header-actions { order: 2; flex-basis: 100%; width: 100%; min-width: 0; flex-wrap: wrap; justify-content: flex-end; row-gap: 8px; }
-	.header-search { order: 3; flex-basis: 100%; max-width: none; }
-	.header-search input { padding-left: 10px; font-size: 13px; }
+	.header-actions { order: 2; margin-left: auto; flex-wrap: nowrap; }
+	/* Search drops to its own full-width row; the category row below the
+	   header still carries navigation, so nothing gets stranded. */
+	.header-search { order: 3; flex-basis: 100%; max-width: none; height: 42px; }
+	.header-search input { font-size: 14px; }
 	.header-actions .btn-sm { padding: 7px 12px; }
 	.label-full { display: none; }
 	.label-short { display: inline; }
-	.hero-cta-row { flex-direction: column; align-items: stretch; }
-	.hero-cta-row .btn { width: 100%; }
-	.hero h1 { font-size: clamp(2.2rem, 9vw, 2.75rem); }
+	.hero { padding: 32px 0 44px; }
+	.hero-copy { align-items: stretch; }
+	.hero h1 { font-size: clamp(2rem, 8.5vw, 2.6rem); }
+	.hero-facts { grid-template-columns: 1fr; }
+	.mode-toggle { align-self: flex-start; }
+	.hero-copy .btn-lg { width: 100%; }
 }
 
 /* ---------- Reduced motion ---------- */
