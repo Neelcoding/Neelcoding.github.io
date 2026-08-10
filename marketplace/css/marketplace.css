@@ -53,6 +53,13 @@ h1, h2, h3, .brand-font {
 	paint-order: stroke fill;
 }
 
+/* Explicit type scale. Headings previously carried no font-size at all and
+   fell through to the UA defaults, so the top of the hierarchy was accidental
+   and sat too close to body copy. Steps are ~1.3x apart. */
+h1 { font-size: 34px; line-height: 1.15; }
+h2 { font-size: 26px; line-height: 1.2; }
+h3 { font-size: 20px; line-height: 1.25; }
+
 a { color: inherit; text-decoration: none; }
 
 img { max-width: 100%; display: block; }
