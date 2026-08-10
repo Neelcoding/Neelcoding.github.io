@@ -41,6 +41,27 @@ a { color: inherit; text-decoration: none; }
 
 img { max-width: 100%; display: block; }
 
+/* Keyboard focus. :focus-visible keeps the ring off mouse clicks but always
+   shows it for tab navigation, which otherwise left no visible position. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+	outline: 2px solid var(--gold-dark);
+	outline-offset: 2px;
+	border-radius: var(--radius-tag);
+}
+/* On dark or photographic backgrounds a terracotta ring disappears, so those
+   get a light ring instead. */
+.hero-photo a:focus-visible,
+.like-btn:focus-visible,
+.thread-bubble-row.mine a:focus-visible {
+	outline-color: var(--cream);
+	box-shadow: 0 0 0 4px rgba(36, 27, 47, 0.45);
+}
+
 .container {
 	max-width: 1440px;
 	margin: 0 auto;
@@ -945,7 +966,7 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
 	.browse-layout { grid-template-columns: 1fr; }
 	.filters { position: static; }
 	.listing-detail { grid-template-columns: 1fr; gap: 28px; }
-	.main-nav { display: none; }
+	.main-nav { gap: 16px; }
 	.form-grid-2 { grid-template-columns: 1fr; }
 	.messages-layout { grid-template-columns: 1fr; height: auto; }
 	.conversation-list { max-height: 220px; }
@@ -964,6 +985,9 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
 		row-gap: 8px;
 	}
 	.logo { order: 1; }
+	/* Nav sits beside the logo on its own row so Browse stays reachable on
+	   phones. Two links don't justify a hamburger. */
+	.main-nav { order: 1; gap: 18px; margin-left: 6px; }
 	.header-actions { order: 2; flex-basis: 100%; width: 100%; min-width: 0; flex-wrap: wrap; justify-content: flex-end; row-gap: 8px; }
 	.header-search { order: 3; flex-basis: 100%; max-width: none; }
 	.header-search input { padding-left: 10px; font-size: 13px; }
@@ -973,4 +997,20 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
 	.hero-cta-row { flex-direction: column; align-items: stretch; }
 	.hero-cta-row .btn { width: 100%; }
 	.hero h1 { font-size: clamp(2.2rem, 9vw, 2.75rem); }
+}
+
+/* ---------- Reduced motion ---------- */
+/* motion.js already skips GSAP work when this is set; this covers the
+   CSS-driven movement it can't reach. */
+@media (prefers-reduced-motion: reduce) {
+	html { scroll-behavior: auto; }
+	*, *::before, *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+	.btn:hover,
+	.btn:active,
+	.listing-card:hover,
+	.listing-card:hover .thumb img { transform: none; }
 }
