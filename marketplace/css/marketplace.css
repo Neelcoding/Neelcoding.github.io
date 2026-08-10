@@ -38,14 +38,19 @@ body {
 	line-height: 1.5;
 }
 
-/* Poiret One ships a single weight (400) and is a light deco face, so any
-   bolder declaration would only trigger a synthetic fake bold. Its wide,
-   geometric letterforms want a little tracking rather than the tight
-   negative spacing a heavy face needs. */
+/* Poiret One ships a single weight (400); Google Fonts serves no 500/600/700,
+   so font-weight:bold would only get a synthetic faux-bold, which smears a
+   thin geometric face unevenly. A real stroke thickens the letterforms
+   uniformly instead. paint-order keeps the stroke behind the fill so counters
+   stay open rather than closing up. */
 h1, h2, h3, .brand-font {
 	font-family: 'Poiret One', 'Century Gothic', sans-serif;
 	font-weight: 400;
 	letter-spacing: 0.02em;
+	/* em, not px: this rule also covers 16px card titles, where a fixed stroke
+	   sized for a 52px headline would close up the counters. */
+	-webkit-text-stroke: 0.028em currentColor;
+	paint-order: stroke fill;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -354,32 +359,6 @@ textarea:focus-visible,
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-}
-
-/* Segmented Buy/Sell control */
-.mode-toggle {
-	display: inline-flex;
-	background: var(--card);
-	border: 1px solid var(--line);
-	border-radius: var(--radius-pill);
-	padding: 4px;
-	margin-bottom: 26px;
-}
-.mode-toggle button {
-	border: none;
-	background: transparent;
-	font-family: inherit;
-	font-size: 15px;
-	font-weight: 600;
-	color: var(--ink-soft);
-	padding: 9px 30px;
-	border-radius: var(--radius-pill);
-	cursor: pointer;
-	transition: background 0.18s ease, color 0.18s ease;
-}
-.mode-toggle button.active {
-	background: var(--cream-dark);
-	color: var(--ink);
 }
 
 .hero h1 {
@@ -1074,7 +1053,6 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
 	.hero-copy { align-items: stretch; }
 	.hero h1 { font-size: clamp(2rem, 8.5vw, 2.6rem); }
 	.hero-facts { grid-template-columns: 1fr; }
-	.mode-toggle { align-self: flex-start; }
 	.hero-copy .btn-lg { width: 100%; }
 }
 
