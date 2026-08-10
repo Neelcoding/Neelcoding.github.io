@@ -1,5 +1,5 @@
 /* ---------- Design tokens ---------- */
-/* EXPERIMENT: lavender background with the original terracotta accent.
+/* EXPERIMENT: light orange ground with a purple accent.
    To go back to the original cream look, comment out the ACTIVE block below
    and uncomment the ORIGINAL one. Full revert: git checkout master -- marketplace/ */
 :root {
@@ -16,16 +16,19 @@
 	--radius-pill: 3px;
 	*/
 
-	/* --- ACTIVE: lavender + original terracotta --- */
-	/* Contrast on the lavender field: --ink 13.9:1, --ink-soft 5.4:1,
-	   --gold-dark 5.7:1, white on --gold 4.7:1. */
+	/* --- ACTIVE: light orange ground + purple accent --- */
+	/* Roles are swapped from the lavender version: orange is now the field
+	   and purple carries the accents, saturated up so it reads as purple
+	   rather than washing out against the warm background.
+	   Contrast on the orange field: --ink 13.6:1, --ink-soft 5.1:1,
+	   --gold-dark 8.1:1, white on --gold 6.9:1. */
 	--ink: #241b2f;
-	--ink-soft: #635a73;
-	--cream: #ece8f4;
-	--cream-dark: #ddd6ec;
-	--gold: #c1502e;
-	--gold-dark: #9b3d22;
-	--line: #d9d2e8;
+	--ink-soft: #6b5f63;
+	--cream: #f9e5d6;
+	--cream-dark: #f2d5be;
+	--gold: #7a3ea1;
+	--gold-dark: #5e2a80;
+	--line: #edd6c2;
 	/* Containers stay softly rounded; only pill-shaped elements go fully round,
 	   since 999px on a card or modal makes lozenges, not bubbles. */
 	--radius: 16px;
@@ -38,7 +41,7 @@
 	--shadow: 0 2px 10px rgba(36, 27, 47, 0.07);
 	--shadow-lift: 0 10px 30px rgba(36, 27, 47, 0.13);
 	/* Translucent version of --cream for the sticky header. */
-	--cream-veil: rgba(236, 232, 244, 0.93);
+	--cream-veil: rgba(249, 229, 214, 0.93);
 }
 
 * { box-sizing: border-box; }
@@ -80,8 +83,8 @@ textarea:focus-visible,
 	outline-offset: 2px;
 	border-radius: var(--radius-tag);
 }
-/* On dark or photographic backgrounds a terracotta ring disappears, so those
-   get a light ring instead. */
+/* On dark or photographic backgrounds the accent-coloured ring disappears,
+   so those get a light ring instead. */
 .hero-photo a:focus-visible,
 .like-btn:focus-visible,
 .thread-bubble-row.mine a:focus-visible {
