@@ -1,9 +1,6 @@
 /* ---------- Design tokens ---------- */
-/* EXPERIMENT: light orange ground with a purple accent.
-   To go back to the original cream look, comment out the ACTIVE block below
-   and uncomment the ORIGINAL one. Full revert: git checkout master -- marketplace/ */
 :root {
-	/* --- ORIGINAL: cream + terracotta (inactive) ---
+	/* Original cream + terracotta palette. */
 	--ink: #241b2f;
 	--ink-soft: #6b5f63;
 	--cream: #fbf7f1;
@@ -11,24 +8,6 @@
 	--gold: #c1502e;
 	--gold-dark: #9b3d22;
 	--line: #eadfd3;
-	--radius: 3px;
-	--radius-tag: 2px;
-	--radius-pill: 3px;
-	*/
-
-	/* --- ACTIVE: light orange ground + purple accent --- */
-	/* Roles are swapped from the lavender version: orange is now the field
-	   and purple carries the accents, saturated up so it reads as purple
-	   rather than washing out against the warm background.
-	   Contrast on the orange field: --ink 13.6:1, --ink-soft 5.1:1,
-	   --gold-dark 8.1:1, white on --gold 6.9:1. */
-	--ink: #241b2f;
-	--ink-soft: #6b5f63;
-	--cream: #f9e5d6;
-	--cream-dark: #f2d5be;
-	--gold: #7a3ea1;
-	--gold-dark: #5e2a80;
-	--line: #edd6c2;
 	/* Containers stay softly rounded; only pill-shaped elements go fully round,
 	   since 999px on a card or modal makes lozenges, not bubbles. */
 	--radius: 16px;
@@ -41,7 +20,7 @@
 	--shadow: 0 2px 10px rgba(36, 27, 47, 0.07);
 	--shadow-lift: 0 10px 30px rgba(36, 27, 47, 0.13);
 	/* Translucent version of --cream for the sticky header. */
-	--cream-veil: rgba(249, 229, 214, 0.93);
+	--cream-veil: rgba(251, 247, 241, 0.92);
 }
 
 * { box-sizing: border-box; }
@@ -59,12 +38,14 @@ body {
 	line-height: 1.5;
 }
 
-/* Archivo Black ships a single weight (400). Asking for 600/700 makes the
-   browser synthesise a fake bold on an already-black face, which smears. */
+/* Poiret One ships a single weight (400) and is a light deco face, so any
+   bolder declaration would only trigger a synthetic fake bold. Its wide,
+   geometric letterforms want a little tracking rather than the tight
+   negative spacing a heavy face needs. */
 h1, h2, h3, .brand-font {
-	font-family: 'Archivo Black', 'Arial Black', sans-serif;
+	font-family: 'Poiret One', 'Century Gothic', sans-serif;
 	font-weight: 400;
-	letter-spacing: -0.01em;
+	letter-spacing: 0.02em;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -116,7 +97,7 @@ textarea:focus-visible,
 }
 
 /* The wordmark keeps its original Playfair Display cut; only body headings
-   moved to Archivo Black. */
+   moved to Poiret One. */
 .logo {
 	font-family: 'Playfair Display', Georgia, serif;
 	font-size: 24px;
@@ -571,7 +552,7 @@ select {
 
 .listing-card .info { padding: 14px; }
 .listing-card .brand { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold-dark); font-weight: 700; }
-.listing-card .name { font-family: 'Archivo Black', 'Arial Black', sans-serif; font-size: 16px; margin: 3px 0 6px; }
+.listing-card .name { font-family: 'Poiret One', 'Century Gothic', sans-serif; font-size: 16px; margin: 3px 0 6px; }
 .listing-card .meta { font-size: 12px; color: var(--ink-soft); display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 .chip {
 	background: var(--cream-dark);
@@ -670,7 +651,7 @@ select {
 	align-items: center;
 	justify-content: center;
 	font-weight: 700;
-	font-family: 'Archivo Black', 'Arial Black', sans-serif;
+	font-family: 'Poiret One', 'Century Gothic', sans-serif;
 	flex-shrink: 0;
 }
 .seller-name { font-weight: 700; }
@@ -768,7 +749,7 @@ select {
 .profile-header h1 { margin: 0 0 4px; font-size: 26px; }
 .profile-meta { color: var(--ink-soft); font-size: 14px; }
 .profile-stats { display: flex; gap: 22px; margin-top: 10px; font-size: 13px; }
-.profile-stats b { font-family: 'Archivo Black', 'Arial Black', sans-serif; font-size: 16px; display: block; }
+.profile-stats b { font-family: 'Poiret One', 'Century Gothic', sans-serif; font-size: 16px; display: block; }
 
 hr.divider { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
 
@@ -952,7 +933,7 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
 	margin-bottom: 12px;
 	background: var(--card);
 }
-.offer-row .offer-amount { font-family: 'Archivo Black', 'Arial Black', sans-serif; font-size: 22px; font-weight: 400; }
+.offer-row .offer-amount { font-family: 'Poiret One', 'Century Gothic', sans-serif; font-size: 22px; font-weight: 400; }
 .offer-row .offer-meta { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
 .offer-row .offer-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .offer-status { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 4px 10px; border-radius: var(--radius-tag); }
@@ -980,7 +961,7 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
 	border-radius: var(--radius-tag);
 	margin-bottom: 10px;
 }
-.auction-current { font-family: 'Archivo Black', 'Arial Black', sans-serif; font-size: 26px; font-weight: 400; }
+.auction-current { font-family: 'Poiret One', 'Century Gothic', sans-serif; font-size: 26px; font-weight: 400; }
 .auction-sub { font-size: 13px; color: var(--ink-soft); margin: 2px 0 14px; }
 .bid-row { display: flex; gap: 10px; }
 .bid-row input {
