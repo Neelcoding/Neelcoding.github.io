@@ -13,6 +13,7 @@ import { isLiked, toggleLiked, isInBag, toggleBag } from './wishlist.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from './supabase-client.js';
 import { revealOnScroll } from './motion.js';
 import { recordView } from './recently-viewed.js';
+import { renderEmptyState } from './empty-state.js';
 
 const root = document.getElementById('listing-root');
 const params = new URLSearchParams(location.search);
@@ -47,12 +48,24 @@ function closeableModal(overlay) {
 
 async function render() {
 	if (!id) {
-		root.innerHTML = `<div class="empty-state">No listing specified.</div>`;
+		root.innerHTML = renderEmptyState({
+			icon: 'broken',
+			title: 'No bottle specified',
+			body: 'That link is missing a listing, so there is nothing to show.',
+			actions: [{ label: 'Browse bottles', href: 'browse.html' }],
+			feature: true,
+		});
 		return;
 	}
 	const listing = await getListingById(id);
 	if (!listing) {
-		root.innerHTML = `<div class="empty-state">This listing doesn't exist or was removed. <a href="browse.html">Back to browsing.</a></div>`;
+		root.innerHTML = renderEmptyState({
+			icon: 'broken',
+			title: 'That bottle is gone',
+			body: 'The seller removed this listing, or the link is wrong.',
+			actions: [{ label: 'Browse bottles', href: 'browse.html' }],
+			feature: true,
+		});
 		return;
 	}
 	const seller = listing.profiles || {};

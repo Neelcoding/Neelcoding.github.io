@@ -25,6 +25,11 @@
 
 * { box-sizing: border-box; }
 
+/* The UA rule for [hidden] is display:none at the same specificity as any
+   class, so a later `.thing { display: flex }` silently beats it and the
+   element stays visible. Make the attribute authoritative instead. */
+[hidden] { display: none !important; }
+
 html { scroll-behavior: smooth; }
 
 html, body { overflow-x: hidden; max-width: 100%; }
@@ -63,6 +68,37 @@ h3 { font-size: 20px; line-height: 1.25; }
 a { color: inherit; text-decoration: none; }
 
 img { max-width: 100%; display: block; }
+
+/* Surfaces the browser draws for us. Left alone they ship system blue and grey
+   into an otherwise warm palette, which is the tell that a page was assembled
+   rather than built. */
+::selection {
+	background: var(--gold);
+	color: #fff;
+}
+input, textarea, select { caret-color: var(--gold-dark); }
+
+* { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+	background: var(--line);
+	border-radius: 999px;
+	/* Inset the thumb so it reads as a rail rather than a filled gutter. */
+	border: 3px solid var(--cream);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--cream-dark); }
+
+/* Prices and bid amounts get compared column to column, so their digits need
+   to line up rather than kern like prose. */
+.listing-card .price,
+.detail-price,
+.offer-row .offer-amount,
+.auction-current,
+.bid-history-row span:last-child,
+.spec-grid .spec-value {
+	font-variant-numeric: tabular-nums;
+}
 
 /* Keyboard focus. :focus-visible keeps the ring off mouse clicks but always
    shows it for tab navigation, which otherwise left no visible position. */
@@ -456,6 +492,25 @@ textarea:focus-visible,
 	top: 88px;
 }
 
+/* Only ever shown below the layout breakpoint; see the media query. */
+.filters-toggle {
+	display: none;
+	align-items: center;
+	gap: 8px;
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: var(--radius-pill);
+	color: var(--ink);
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	padding: 10px 18px;
+	cursor: pointer;
+	margin-bottom: 16px;
+	align-self: start;
+}
+.filters-toggle:hover { border-color: var(--gold); }
+
 .filters h3 {
 	font-size: 12px;
 	text-transform: uppercase;
@@ -608,11 +663,90 @@ select {
 }
 .listing-card .price { font-size: 18px; font-weight: 700; }
 
-.empty-state {
-	text-align: center;
-	padding: 60px 20px;
+/* Lede under a page title. Held to a readable measure rather than running the
+   full panel width. */
+.page-lede {
 	color: var(--ink-soft);
+	max-width: 62ch;
+	margin: 0 0 28px;
+	line-height: 1.55;
+}
+
+/* Marks a field as skippable inline, so required is the quiet default and
+   optional is the thing that gets said out loud. */
+.label-optional {
+	font-weight: 500;
+	font-size: 12px;
+	color: var(--ink-soft);
+	text-transform: none;
+	letter-spacing: 0;
+	margin-left: 6px;
+}
+
+/* Small-caps section label. Carried as a heading element so the document
+   outline is real, with the display face and scale overridden back down. */
+.section-title {
+	font-family: 'Outfit', system-ui, sans-serif;
+	font-size: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--ink-soft);
+	margin: 0 0 14px;
+	-webkit-text-stroke: 0;
+}
+
+/* ---------- Empty, gated and error states ---------- */
+/* These sit on the page ground rather than inside a card. A marketplace with
+   nothing in it reads as broken if the nothing is boxed and centred like a
+   widget; open space plus a real next action reads as early. */
+.empty-state {
 	grid-column: 1 / -1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	padding: 48px 20px;
+	color: var(--ink-soft);
+}
+.empty-state.is-feature { padding: 88px 20px 96px; }
+
+.empty-icon {
+	display: block;
+	color: var(--gold-dark);
+	margin-bottom: 20px;
+	opacity: 0.85;
+}
+.empty-icon svg { width: 30px; height: 30px; }
+.is-feature .empty-icon svg { width: 38px; height: 38px; }
+
+.empty-title {
+	margin: 0 0 10px;
+	color: var(--ink);
+	font-size: 20px;
+}
+.is-feature .empty-title { font-size: 26px; }
+
+.empty-body {
+	margin: 0;
+	/* Held well under the 65-75ch body measure: this is a short aside, and a
+	   full-measure line centred under a heading reads as a paragraph. */
+	max-width: 46ch;
+	font-size: 15px;
+	line-height: 1.55;
+}
+
+.empty-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 10px;
+	margin-top: 26px;
+}
+.empty-state a:not(.btn) {
+	color: var(--gold-dark);
+	text-decoration: underline;
+	text-underline-offset: 3px;
 }
 
 /* ---------- Listing detail ---------- */
@@ -1024,6 +1158,10 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
 @media (max-width: 860px) {
 	.browse-layout { grid-template-columns: 1fr; }
 	.filters { position: static; }
+	/* Collapsed by default so the results are the first thing below the header. */
+	.filters-toggle { display: inline-flex; }
+	.filters { display: none; }
+	.filters.is-open { display: block; }
 	.listing-detail { grid-template-columns: 1fr; gap: 28px; }
 	.form-grid-2 { grid-template-columns: 1fr; }
 	.messages-layout { grid-template-columns: 1fr; height: auto; }

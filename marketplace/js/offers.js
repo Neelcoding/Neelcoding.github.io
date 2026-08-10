@@ -1,5 +1,6 @@
-import { getCurrentUser, getOffersForSeller, respondToOffer, updateListingStatus } from './db.js';
+import { getCurrentUser, getOffersForSeller, getListingsBySeller, respondToOffer, updateListingStatus } from './db.js';
 import { revealOnScroll } from './motion.js';
+import { renderEmptyState, renderSignedOut as renderSignedOutState } from './empty-state.js';
 
 const root = document.getElementById('offers-root');
 
@@ -10,12 +11,37 @@ function escapeHtml(str) {
 }
 
 function renderSignedOut() {
-	root.innerHTML = `
-		<div class="card-panel" style="text-align:center;">
-			<h2 style="margin-top:0;">Sign in to view offers</h2>
-			<a href="account.html" class="btn btn-primary">Sign in / Create account</a>
-		</div>
-	`;
+	root.innerHTML = renderSignedOutState({
+		title: 'Offers on your bottles land here',
+		body: 'Sign in to see what buyers are willing to pay, sorted highest first, and accept or decline each one.',
+	});
+}
+
+/* Nothing to accept yet has two causes with different fixes: no bottles listed,
+   or bottles listed that nobody has bid on. Sending someone to "list a bottle"
+   when they already have five is useless advice. */
+async function emptyOffersState(userId) {
+	const listings = await getListingsBySeller(userId);
+	if (!listings.length) {
+		return renderEmptyState({
+			icon: 'tag',
+			title: 'No offers yet',
+			body: 'Offers arrive once you have something listed. Buyers name a price under your asking price, and you decide.',
+			actions: [{ label: 'List a bottle', href: 'sell.html' }],
+			feature: true,
+		});
+	}
+	const live = listings.filter((l) => l.status !== 'sold').length;
+	return renderEmptyState({
+		icon: 'tag',
+		title: 'No offers yet',
+		body: `You have ${live} bottle${live === 1 ? '' : 's'} up. When a buyer offers below your asking price it appears here, highest first, and nothing is charged unless you accept.`,
+		actions: [
+			{ label: 'View your listings', href: 'my-listings.html' },
+			{ label: 'List another', href: 'sell.html', variant: 'btn-outline' },
+		],
+		feature: true,
+	});
 }
 
 async function render() {
@@ -27,7 +53,7 @@ async function render() {
 	root.innerHTML = `
 		<h1 style="margin-bottom:6px;">Offers on your listings</h1>
 		<p style="color:var(--ink-soft);margin:0 0 24px;">Sorted from highest to lowest. Offers aren't binding, so accepting one won't charge the buyer automatically.</p>
-		${offers.length ? offers.map(offerRow).join('') : `<div class="empty-state" style="padding:40px 20px;">No offers yet.</div>`}
+		${offers.length ? offers.map(offerRow).join('') : await emptyOffersState(user.id)}
 	`;
 
 	offers.forEach((offer) => {

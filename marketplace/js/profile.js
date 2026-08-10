@@ -1,5 +1,6 @@
 import { getProfile, getListingsBySeller, CONDITIONS } from './db.js';
 import { renderThumbImage, renderAvatar } from './icons.js';
+import { renderEmptyState } from './empty-state.js';
 
 const root = document.getElementById('profile-root');
 const params = new URLSearchParams(location.search);
@@ -37,12 +38,24 @@ function card(listing) {
 
 async function render() {
 	if (!id) {
-		root.innerHTML = `<div class="empty-state">No seller specified.</div>`;
+		root.innerHTML = renderEmptyState({
+			icon: 'broken',
+			title: 'No seller specified',
+			body: 'That link is missing a seller, so there is nothing to show.',
+			actions: [{ label: 'Browse bottles', href: 'browse.html' }],
+			feature: true,
+		});
 		return;
 	}
 	const profile = await getProfile(id);
 	if (!profile) {
-		root.innerHTML = `<div class="empty-state">This seller doesn't exist. <a href="browse.html">Back to browsing.</a></div>`;
+		root.innerHTML = renderEmptyState({
+			icon: 'broken',
+			title: "That seller isn't here",
+			body: 'The account may have been removed, or the link may be wrong.',
+			actions: [{ label: 'Browse bottles', href: 'browse.html' }],
+			feature: true,
+		});
 		return;
 	}
 	const listings = await getListingsBySeller(id);
@@ -63,12 +76,16 @@ async function render() {
 		</div>
 		${profile.bio ? `<p style="color:var(--ink-soft);max-width:640px;">${escapeHtml(profile.bio)}</p>` : ''}
 		<hr class="divider" />
-		<div class="section-title">Available (${active.length})</div>
+		<h3 class="section-title">Available (${active.length})</h3>
 		<div class="listing-grid" style="margin-bottom:32px;">
-			${active.length ? active.map(card).join('') : `<div class="empty-state">Nothing listed right now.</div>`}
+			${active.length ? active.map(card).join('') : renderEmptyState({
+				icon: 'bottle',
+				title: 'Nothing available',
+				body: 'This seller has no bottles up at the moment.',
+			})}
 		</div>
 		${sold.length ? `
-			<div class="section-title">Sold (${sold.length})</div>
+			<h3 class="section-title">Sold (${sold.length})</h3>
 			<div class="listing-grid">${sold.map(card).join('')}</div>
 		` : ''}
 	`;

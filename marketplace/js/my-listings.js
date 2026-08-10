@@ -1,6 +1,7 @@
 import { getCurrentUser, getListingsBySeller, updateListingStatus, CONDITIONS } from './db.js';
 import { renderThumbImage } from './icons.js';
 import { revealOnScroll } from './motion.js';
+import { renderEmptyState, renderSignedOut as renderSignedOutState } from './empty-state.js';
 
 const root = document.getElementById('my-listings-root');
 
@@ -15,12 +16,10 @@ function conditionLabel(value) {
 }
 
 function renderSignedOut() {
-	root.innerHTML = `
-		<div class="card-panel" style="text-align:center;">
-			<h2 style="margin-top:0;">Sign in to see your listings</h2>
-			<a href="account.html" class="btn btn-primary">Sign in / Create account</a>
-		</div>
-	`;
+	root.innerHTML = renderSignedOutState({
+		title: 'Your listings live here',
+		body: 'Sign in to see what you have up, mark bottles sold, and track the offers and bids coming in on them.',
+	});
 }
 
 async function render() {
@@ -38,7 +37,13 @@ async function render() {
 			</div>
 		</div>
 		<p style="color:var(--ink-soft);margin:0 0 24px;">Everything you've listed, in one place.</p>
-		${listings.length ? listings.map(listingRow).join('') : `<div class="empty-state" style="padding:40px 20px;">You haven't listed anything yet.</div>`}
+		${listings.length ? listings.map(listingRow).join('') : renderEmptyState({
+			icon: 'bottle',
+			title: 'No bottles up yet',
+			body: 'Listing takes a couple of minutes. Once a bottle is live, buyers can ask about it, offer under your price, or bid against each other for it.',
+			actions: [{ label: 'List your first bottle', href: 'sell.html' }],
+			feature: true,
+		})}
 	`;
 
 	listings.forEach((listing) => {

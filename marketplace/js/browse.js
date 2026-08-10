@@ -3,6 +3,7 @@ import { MOCK_LISTINGS } from './mock-data.js';
 import { getLikedIds, getBagIds } from './wishlist.js';
 import { revealOnScroll } from './motion.js';
 import { renderListingCard, wireLikeButtons } from './listing-card.js';
+import { renderEmptyState } from './empty-state.js';
 
 const grid = document.getElementById('listing-grid');
 const resultsCount = document.getElementById('results-count');
@@ -105,6 +106,64 @@ function currentFilters() {
 	};
 }
 
+/** True when anything is narrowing the results, so an empty grid means the
+ *  filters excluded everything rather than the marketplace being empty. */
+function hasActiveFilters(filters) {
+	return Boolean(
+		filters.search ||
+		filters.brand ||
+		filters.condition ||
+		filters.gender ||
+		filters.scentFamily.length ||
+		filters.minPrice != null ||
+		filters.maxPrice != null ||
+		auctionParam,
+	);
+}
+
+/* "Nothing matched your filters" and "nothing has ever been listed" look
+   identical in an empty grid but need opposite recoveries: widen the search
+   versus put the first bottle up. */
+function emptyStateFor(filters) {
+	if (viewParam === 'liked') {
+		return renderEmptyState({
+			icon: 'heart',
+			title: 'Nothing saved yet',
+			body: 'The heart on any listing keeps it here, so you can compare a few bottles before committing to one.',
+			actions: [{ label: 'Browse everything', href: 'browse.html' }],
+		});
+	}
+	if (viewParam === 'bag') {
+		return renderEmptyState({
+			icon: 'bag',
+			title: 'Your bag is empty',
+			body: 'Add bottles from a listing page to line them up side by side before you buy.',
+			actions: [{ label: 'Browse everything', href: 'browse.html' }],
+		});
+	}
+	if (hasActiveFilters(filters)) {
+		return renderEmptyState({
+			icon: auctionParam ? 'gavel' : 'search',
+			title: auctionParam ? 'No auctions running' : 'Nothing matches those filters',
+			body: auctionParam
+				? 'Sellers can run any listing as an auction for up to seven days. None are live right now.'
+				: 'Every filter narrows the results. Clearing a few should bring more back.',
+			actions: [
+				{ label: 'Clear filters', href: 'browse.html' },
+				{ label: 'List a bottle', href: 'sell.html', variant: 'btn-outline' },
+			],
+		});
+	}
+	// Nothing listed at all. Say so plainly rather than blaming the search.
+	return renderEmptyState({
+		icon: 'bottle',
+		title: 'Nothing listed yet',
+		body: 'Vial is new, so the shelves are bare. Put a bottle up and buyers can message you, offer below asking, or bid if you run it as an auction.',
+		actions: [{ label: 'List the first bottle', href: 'sell.html' }],
+		feature: true,
+	});
+}
+
 async function render() {
 	resultsCount.textContent = 'Loading listings…';
 	grid.innerHTML = '';
@@ -130,14 +189,7 @@ async function render() {
 					: 'listing';
 		resultsCount.textContent = `${listings.length} ${label}${listings.length === 1 ? '' : 's'}`;
 		if (!listings.length) {
-			const emptyMsg = viewParam === 'liked'
-				? 'Nothing liked yet.<br />Tap the heart on any listing to save it here.'
-				: viewParam === 'bag'
-					? 'Your bag is empty.<br />Add items from a listing page.'
-					: auctionParam
-						? 'No live auctions right now.<br /><a href="browse.html">See everything instead.</a>'
-						: 'No fragrances match those filters yet.<br />Try widening your search.';
-			grid.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
+			grid.innerHTML = emptyStateFor(filters);
 			return;
 		}
 		grid.innerHTML = listings.map(renderListingCard).join('');
@@ -148,7 +200,22 @@ async function render() {
 	}
 }
 
+/* On a phone the filter panel is taller than the viewport, so leaving it open
+   by default buries the listings under a wall of checkboxes. The toggle only
+   exists below the layout breakpoint; on desktop the panel is always open and
+   the button is hidden. */
+function wireFilterToggle() {
+	const toggle = document.getElementById('filters-toggle');
+	const panel = document.getElementById('filters');
+	if (!toggle || !panel) return;
+	toggle.addEventListener('click', () => {
+		const open = panel.classList.toggle('is-open');
+		toggle.setAttribute('aria-expanded', String(open));
+	});
+}
+
 populateStaticFilters();
+wireFilterToggle();
 render();
 
 [brandSelect, conditionSelect, sortSelect].forEach((el) => el.addEventListener('change', render));

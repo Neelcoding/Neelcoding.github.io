@@ -1,4 +1,5 @@
 import { getCurrentUser, createListing, SCENT_FAMILIES, CONDITIONS } from './db.js';
+import { renderSignedOut as renderSignedOutState } from './empty-state.js';
 
 const root = document.getElementById('sell-root');
 let selectedFiles = [];
@@ -10,19 +11,16 @@ function escapeHtml(str) {
 }
 
 function renderSignedOut() {
-	root.innerHTML = `
-		<div class="card-panel" style="text-align:center;">
-			<h2 style="margin-top:0;">Sign in to list a fragrance</h2>
-			<p style="color:var(--ink-soft);">You'll need an account so buyers know who they're dealing with.</p>
-			<a href="account.html" class="btn btn-primary">Sign in / Create account</a>
-		</div>
-	`;
+	root.innerHTML = renderSignedOutState({
+		title: 'List a bottle',
+		body: 'You need an account so buyers know who they are dealing with and can message you about the bottle.',
+	});
 }
 
 function renderForm(user) {
 	root.innerHTML = `
-		<h1 style="margin-bottom:6px;">List a fragrance</h1>
-		<p style="color:var(--ink-soft);margin-top:0 0 24px;">Accurate fill level and condition details help your listing sell faster.</p>
+		<h1 style="margin-bottom:6px;">List a bottle</h1>
+		<p class="page-lede">Takes a couple of minutes. Answer honestly rather than generously: buyers here are choosing partly on how much is left, and an accurate listing is what gets offers instead of questions.</p>
 		<div class="card-panel">
 			<div id="form-msg"></div>
 			<form id="sell-form">
@@ -47,28 +45,32 @@ function renderForm(user) {
 						</select>
 					</div>
 					<div class="form-row">
-						<label>Price (USD) *</label>
+						<label for="s-price">Price (USD) *</label>
 						<input type="number" id="s-price" min="1" step="1" required />
+						<div class="hint">Buyers can offer under this, so leave yourself a little room.</div>
 					</div>
 				</div>
 
 				<div class="form-grid-2">
 					<div class="form-row">
-						<label>Size (ml) *</label>
+						<label for="s-size">Size (ml) *</label>
 						<input type="number" id="s-size" min="1" required />
+						<div class="hint">The bottle's full capacity, printed on the base or the box.</div>
 					</div>
 					<div class="form-row">
-						<label>Fill level (%) *</label>
+						<label for="s-fill">Fill level (%) *</label>
 						<input type="number" id="s-fill" min="1" max="100" required />
+						<div class="hint">How full the bottle is now. Eyeball it against the glass: untouched is 100, halfway is 50. Round down if you are unsure.</div>
 					</div>
 				</div>
 
 				<div class="form-grid-2">
 					<div class="form-row">
-						<label>Condition *</label>
+						<label for="s-condition">Condition *</label>
 						<select id="s-condition" required>
 							${CONDITIONS.map((c) => `<option value="${c.value}">${c.label}</option>`).join('')}
 						</select>
+						<div class="hint">The bottle and its label, not the liquid. Scuffs, a worn atomiser or a faded label all count.</div>
 					</div>
 					<div class="form-row">
 						<label>Box included</label>
@@ -82,12 +84,14 @@ function renderForm(user) {
 
 				<div class="form-grid-2">
 					<div class="form-row">
-						<label>Batch code</label>
-						<input type="text" id="s-batch" placeholder="Helps buyers verify authenticity" />
+						<label for="s-batch">Batch code <span class="label-optional">optional</span></label>
+						<input type="text" id="s-batch" placeholder="e.g. 8K01" />
+						<div class="hint">A short code stamped on the bottom of the bottle or the box, usually three to five characters. Buyers use it to check age. Skip it if you cannot find one.</div>
 					</div>
 					<div class="form-row">
-						<label>Year purchased</label>
+						<label for="s-year">Year purchased <span class="label-optional">optional</span></label>
 						<input type="number" id="s-year" min="1990" max="2026" placeholder="2024" />
+						<div class="hint">Roughly is fine. Helps buyers judge how it has been stored.</div>
 					</div>
 				</div>
 

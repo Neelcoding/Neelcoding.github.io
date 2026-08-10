@@ -1,5 +1,6 @@
 import { getCurrentUser, getConversations, getMessages, sendMessage, markConversationRead } from './db.js';
 import { renderAvatar } from './icons.js';
+import { renderEmptyState, renderSignedOut as renderSignedOutState } from './empty-state.js';
 
 const root = document.getElementById('messages-root');
 const params = new URLSearchParams(location.search);
@@ -21,12 +22,10 @@ function timeLabel(iso) {
 }
 
 function renderSignedOut() {
-	root.innerHTML = `
-		<div class="card-panel" style="text-align:center;max-width:480px;margin:40px auto;">
-			<h2 style="margin-top:0;">Sign in to view your messages</h2>
-			<a href="account.html" class="btn btn-primary">Sign in / Create account</a>
-		</div>
-	`;
+	root.innerHTML = renderSignedOutState({
+		title: 'Your conversations live here',
+		body: 'Sign in to pick up threads with buyers and sellers about specific bottles.',
+	});
 }
 
 async function render() {
@@ -39,10 +38,20 @@ async function render() {
 		<h1 style="margin-bottom:20px;">Messages</h1>
 		<div class="messages-layout">
 			<div class="conversation-list" id="conversation-list">
-				${conversations.length ? conversations.map((c) => conversationRow(c, user)).join('') : `<div class="empty-state" style="padding:32px 16px;">No conversations yet.<br />Contact a seller from a listing to start one.</div>`}
+				${conversations.length ? conversations.map((c) => conversationRow(c, user)).join('') : renderEmptyState({
+						icon: 'message',
+						title: 'No conversations',
+						body: 'Ask a seller about a bottle before you commit and the thread starts here.',
+						actions: [{ label: 'Browse bottles', href: 'browse.html' }],
+					})}
 			</div>
 			<div class="thread-pane" id="thread-pane">
-				${activeId ? '' : `<div class="empty-state" style="padding:60px 20px;">Select a conversation.</div>`}
+				${activeId ? '' : renderEmptyState({
+					icon: 'message',
+					title: 'Pick a conversation',
+					body: 'Choose a thread on the left to read it and reply.',
+					feature: true,
+				})}
 			</div>
 		</div>
 	`;
