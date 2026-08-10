@@ -1,7 +1,7 @@
 /* ---------- Design tokens ---------- */
-/* EXPERIMENT: blush + navy palette. To go back to the original cream +
-   terracotta look, comment out the ACTIVE block below and uncomment the
-   ORIGINAL one. Full revert: git checkout master -- marketplace/ */
+/* EXPERIMENT: lavender background with the original terracotta accent.
+   To go back to the original cream look, comment out the ACTIVE block below
+   and uncomment the ORIGINAL one. Full revert: git checkout master -- marketplace/ */
 :root {
 	/* --- ORIGINAL: cream + terracotta (inactive) ---
 	--ink: #241b2f;
@@ -16,16 +16,16 @@
 	--radius-pill: 3px;
 	*/
 
-	/* --- ACTIVE: salmon pink + blue --- */
-	/* Contrast checked against the pink field: --ink 5.9:1, --ink-soft 4.7:1,
-	   white on --gold 6.0:1. */
-	--ink: #1b3a6b;
-	--ink-soft: #354a79;
-	--cream: #efaea0;
-	--cream-dark: #e89684;
-	--gold: #2c5bd0;
-	--gold-dark: #1e44a8;
-	--line: #e0a093;
+	/* --- ACTIVE: lavender + original terracotta --- */
+	/* Contrast on the lavender field: --ink 13.9:1, --ink-soft 5.4:1,
+	   --gold-dark 5.7:1, white on --gold 4.7:1. */
+	--ink: #241b2f;
+	--ink-soft: #635a73;
+	--cream: #ece8f4;
+	--cream-dark: #ddd6ec;
+	--gold: #c1502e;
+	--gold-dark: #9b3d22;
+	--line: #d9d2e8;
 	/* Containers stay softly rounded; only pill-shaped elements go fully round,
 	   since 999px on a card or modal makes lozenges, not bubbles. */
 	--radius: 16px;
@@ -35,10 +35,10 @@
 	--card: #ffffff;
 	--danger: #b1443b;
 	--success: #3f7451;
-	--shadow: 0 2px 10px rgba(22, 36, 63, 0.07);
-	--shadow-lift: 0 10px 30px rgba(22, 36, 63, 0.14);
+	--shadow: 0 2px 10px rgba(36, 27, 47, 0.07);
+	--shadow-lift: 0 10px 30px rgba(36, 27, 47, 0.13);
 	/* Translucent version of --cream for the sticky header. */
-	--cream-veil: rgba(239, 174, 160, 0.93);
+	--cream-veil: rgba(236, 232, 244, 0.93);
 }
 
 * { box-sizing: border-box; }
@@ -86,7 +86,7 @@ textarea:focus-visible,
 .like-btn:focus-visible,
 .thread-bubble-row.mine a:focus-visible {
 	outline-color: var(--cream);
-	box-shadow: 0 0 0 4px rgba(22, 36, 63, 0.45);
+	box-shadow: 0 0 0 4px rgba(36, 27, 47, 0.45);
 }
 
 .container {
@@ -298,7 +298,7 @@ textarea:focus-visible,
 	background: var(--ink);
 	color: var(--cream);
 }
-.btn-primary:hover { background: #0d1728; }
+.btn-primary:hover { background: #000; }
 
 .btn-gold {
 	background: var(--gold);
@@ -555,7 +555,7 @@ select {
 	position: absolute;
 	top: 10px;
 	left: 10px;
-	background: rgba(27, 58, 107, 0.88);
+	background: rgba(36, 27, 47, 0.85);
 	color: #fff;
 	font-size: 11px;
 	font-weight: 600;
