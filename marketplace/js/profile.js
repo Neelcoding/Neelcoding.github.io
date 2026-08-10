@@ -74,7 +74,7 @@ async function render() {
 				</div>
 			</div>
 		</div>
-		${profile.bio ? `<p style="color:var(--ink-soft);max-width:640px;">${escapeHtml(profile.bio)}</p>` : ''}
+		${profile.bio ? `<p class="profile-bio">${escapeHtml(profile.bio)}</p>` : ''}
 		<hr class="divider" />
 		<h3 class="section-title">Available (${active.length})</h3>
 		<div class="listing-grid" style="margin-bottom:32px;">

@@ -22,7 +22,7 @@ function escapeHtml(str) {
 function renderAuthForms() {
 	root.innerHTML = `
 		<div class="card-panel">
-			<h2 style="margin-top:0;">Sign in</h2>
+			<h1 style="margin-top:0;">Sign in</h1>
 			<div id="form-msg"></div>
 			<form id="login-form">
 				<div class="form-row">
@@ -60,7 +60,7 @@ function renderAuthForms() {
 function renderSignupForm() {
 	root.innerHTML = `
 		<div class="card-panel">
-			<h2 style="margin-top:0;">Create your account</h2>
+			<h1 style="margin-top:0;">Create your account</h1>
 			<div id="form-msg"></div>
 			<form id="signup-form">
 				<div class="form-row">
@@ -108,7 +108,7 @@ async function renderAccount() {
 
 	root.innerHTML = `
 		<div class="card-panel" style="margin-bottom:24px;">
-			<h2 style="margin-top:0;">Your profile</h2>
+			<h1 style="margin-top:0;">Your profile</h1>
 			<div id="form-msg"></div>
 			<div style="display:flex;align-items:center;gap:16px;margin-bottom:22px;">
 				<div id="avatar-preview">${renderAvatar(profile, 64)}</div>

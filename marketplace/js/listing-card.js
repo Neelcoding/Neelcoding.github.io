@@ -29,7 +29,7 @@ export function renderListingCard(listing) {
 					<div class="meta">
 						<span class="chip">${listing.size_ml}ml</span>
 						<span class="chip">${listing.fill_percentage}% full</span>
-						<span class="chip">${conditionLabel(listing.condition)}</span>
+						<span class="chip chip-condition" data-condition="${escapeHtml(listing.condition)}">${conditionLabel(listing.condition)}</span>
 					</div>
 					<div class="price">$${Number(listing.price).toFixed(0)}</div>
 				</div>

@@ -98,7 +98,7 @@ async function render() {
 				<div class="spec-grid">
 					<div><div class="spec-label">Size</div><div class="spec-value">${listing.size_ml} ml</div></div>
 					<div><div class="spec-label">Fill level</div><div class="spec-value">${listing.fill_percentage}%</div></div>
-					<div><div class="spec-label">Condition</div><div class="spec-value">${conditionLabel(listing.condition)}</div></div>
+					<div><div class="spec-label">Condition</div><div class="spec-value"><span class="chip chip-condition" data-condition="${escapeHtml(listing.condition)}">${conditionLabel(listing.condition)}</span></div></div>
 					<div><div class="spec-label">Box</div><div class="spec-value">${escapeHtml(boxLabel(listing.box_included))}</div></div>
 					<div><div class="spec-label">Batch code</div><div class="spec-value">${escapeHtml(listing.batch_code || 'N/A')}</div></div>
 					<div><div class="spec-label">Purchased</div><div class="spec-value">${listing.purchase_year || 'N/A'}</div></div>
