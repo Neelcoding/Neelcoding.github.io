@@ -1,33 +1,52 @@
-/* ---------- Design tokens ---------- */
+/* ---------- Design tokens ----------
+   The Perfumer's Organ. Cool graphite shelf over cool paper; achromatic
+   throughout except amber, which is reserved for the fill gauge so that
+   chroma on this site always means liquid volume. Warm cream and terracotta
+   are deliberately absent: that pairing is the category's default surface and
+   the thing this redesign exists to leave behind. */
 :root {
-	/* Original cream + terracotta palette. */
-	--ink: #241b2f;
-	--ink-soft: #6b5f63;
-	--cream: #fbf7f1;
-	--cream-dark: #f1e6d9;
-	--gold: #c1502e;
-	--gold-dark: #9b3d22;
-	--line: #eadfd3;
-	/* Containers stay softly rounded; only pill-shaped elements go fully round,
-	   since 999px on a card or modal makes lozenges, not bubbles. */
-	--radius: 16px;
-	--radius-tag: 999px;
-	--radius-pill: 999px;
+	/* Surfaces */
+	--paper: #efefeb;          /* marketplace ground, cool not cream */
+	--surface: #f8f8f5;        /* raised: cards, panels, inputs */
+	--shelf: #16181a;          /* the shelf band: header + hero */
+	--shelf-raised: #212528;   /* raised within the shelf */
 
-	/* Type roles. Sixteen ad-hoc sizes previously did this job, with 13px and
-	   14px both carrying "small" across 36 declarations. Seven roles, each
-	   named for what it does, roughly a 1.25 step apart. */
-	--text-micro: 12px;  /* uppercase spec and filter labels */
-	--text-sm: 14px;     /* metadata, hints, chips */
-	--text-base: 16px;   /* body */
-	--text-lg: 20px;     /* subsection, card titles */
-	--text-xl: 26px;     /* section headings */
-	--text-2xl: 34px;    /* page titles */
-	--text-display: clamp(2.4rem, 3.8vw, 3.4rem);
+	/* Ink */
+	--ink: #16181a;
+	--ink-2: #5b6063;          /* secondary */
+	--ink-3: #63686b;          /* micro labels; darkened to clear AA on paper */
+	--on-shelf: #eceae5;
+	--on-shelf-2: #9aa0a3;
 
-	/* Spacing on a 4 base. Replaces one-offs at 2, 3, 7, 9, 11, 13, 18, 22 and
-	   26px, which made every interval look deliberate and none of them read as
-	   a system. */
+	/* Rules. Hairlines carry structure here in place of borders and cards. */
+	--rule: #dcdcd5;
+	--rule-strong: #c3c3ba;
+	--rule-on-shelf: rgba(236, 234, 229, 0.16);
+
+	/* The only chroma in the system. Amber is the juice in the bottle: it
+	   appears on fill gauges and nowhere decorative. */
+	--amber: #b57814;          /* clears 3:1 as a graphic on both grounds */
+	--amber-bright: #e0a338;
+	--amber-track: rgba(201, 135, 28, 0.16);
+
+	--danger: #9e3b32;
+	--success: #3f6b4f;
+
+	/* Type. Piazzolla carries editorial voice, Archivo the interface, Azeret
+	   Mono only measured data: codes, volumes, percentages, prices. */
+	--font-display: 'Piazzolla', Georgia, serif;
+	--font-ui: 'Archivo', system-ui, -apple-system, sans-serif;
+	--font-data: 'Azeret Mono', ui-monospace, SFMono-Regular, monospace;
+
+	--text-micro: 11px;
+	--text-sm: 13px;
+	--text-base: 16px;
+	--text-lg: 20px;
+	--text-xl: 28px;
+	--text-2xl: 40px;
+	--text-display: clamp(2.75rem, 5.6vw, 5rem);
+
+	/* Space, 4 base. */
 	--space-1: 4px;
 	--space-2: 8px;
 	--space-3: 12px;
@@ -41,42 +60,70 @@
 	--space-14: 56px;
 	--space-16: 64px;
 	--space-22: 88px;
+	--space-28: 112px;
 
-	--card: #ffffff;
-	--danger: #b1443b;
-	--success: #3f7451;
+	/* Radius. Deliberately small. Pills are for status chips only; specimen
+	   photography is square-cornered. */
+	--r-sm: 3px;
+	--r-md: 5px;
+	--r-lg: 8px;
+	--r-pill: 999px;
+	--r-image: 0px;
 
-	/* Action roles, named so the ambiguity stops. Ink already carried the
-	   primary action in fourteen places while terracotta sat on two buttons
-	   plus a lot of decoration, so the two read as competing primaries.
-	   Ink is the action; terracotta marks the selling path and the brand. */
+	/* Legacy aliases so existing component rules keep resolving. */
+	--radius: var(--r-md);
+	--radius-tag: var(--r-pill);
+	--radius-pill: var(--r-sm);
+	--cream: var(--paper);
+	--cream-dark: #e3e3dc;
+	--card: var(--surface);
+	--line: var(--rule);
+	--gold: var(--ink);
+	--gold-dark: var(--ink);
+	--ink-soft: var(--ink-2);
 	--action: var(--ink);
-	--action-hover: #120d18;
-	--sell: var(--gold);
-	--sell-hover: var(--gold-dark);
+	--action-hover: #000;
+	--sell: var(--ink);
+	--sell-hover: #000;
+	--cream-veil: rgba(239, 239, 235, 0.94);
 
-	/* Condition is the most decision-relevant thing about a used bottle and was
-	   rendered as four identical grey chips. Ranked by tint, anchored on the
-	   green already in the palette so no new hue enters the system. The label
-	   always ships alongside, so colour is never the only code. */
-	/* Adjacent steps are spaced far enough apart to be told apart at chip size;
-	   the first pass was subtle enough that gently_used and well_used shared a
-	   background and only the text colour moved. All four clear AA. */
-	--cond-new-bg: #d6e8db;
-	--cond-new-fg: #24512f;
-	--cond-likenew-bg: #e7f0e5;
-	--cond-likenew-fg: #3b5a38;
-	--cond-gently-bg: #efe4d6;
-	--cond-gently-fg: #665a5e;
-	--cond-well-bg: #ebd6c1;
-	--cond-well-fg: #6d4829;
-	--shadow: 0 2px 10px rgba(36, 27, 47, 0.07);
-	--shadow-lift: 0 10px 30px rgba(36, 27, 47, 0.13);
-	/* Translucent version of --cream for the sticky header. */
-	--cream-veil: rgba(251, 247, 241, 0.92);
+	/* Motion. One easing, no overshoot. */
+	--ease: cubic-bezier(0.22, 0.61, 0.24, 1);
+	--dur-fast: 150ms;
+	--dur: 220ms;
+	--dur-slow: 480ms;
+
+	/* Measure */
+	--container: 1360px;
+	--gutter: clamp(20px, 3.5vw, 56px);
+
+	--shadow: none;
+	--shadow-lift: 0 1px 0 var(--rule-strong);
+
+	/* Condition scale, kept achromatic so amber stays unique to volume.
+	   Rank is carried by ink weight and a leading tick, not by hue. */
+	--cond-new-bg: #e4e6e2;
+	--cond-new-fg: #24302a;
+	--cond-likenew-bg: #e8e8e3;
+	--cond-likenew-fg: #3a423d;
+	--cond-gently-bg: #ecebe6;
+	--cond-gently-fg: #5b6063;
+	--cond-well-bg: #efeee9;
+	--cond-well-fg: #767b7e;
 }
 
 * { box-sizing: border-box; }
+
+/* Available to structure that screen readers need and the layout does not. */
+.sr-only {
+	position: absolute;
+	width: 1px; height: 1px;
+	padding: 0; margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
 
 /* The UA rule for [hidden] is display:none at the same specificity as any
    class, so a later `.thing { display: flex }` silently beats it and the
@@ -91,32 +138,48 @@ body {
 	margin: 0;
 	background: var(--cream);
 	color: var(--ink);
-	font-family: 'Outfit', system-ui, sans-serif;
+	font-family: var(--font-ui);
 	font-size: var(--text-base);
-	line-height: 1.5;
+	line-height: 1.55;
+	-webkit-font-smoothing: antialiased;
 }
 
-/* Poiret One ships a single weight (400); Google Fonts serves no 500/600/700,
-   so font-weight:bold would only get a synthetic faux-bold, which smears a
-   thin geometric face unevenly. A real stroke thickens the letterforms
-   uniformly instead. paint-order keeps the stroke behind the fill so counters
-   stay open rather than closing up. */
+/* Piazzolla carries the editorial voice. Its optical-size axis is set from the
+   role, so display sizes get the tighter, higher-contrast cut and small
+   headings stay sturdy. No synthetic weights, no stroke tricks. */
 h1, h2, h3, .brand-font {
-	font-family: 'Poiret One', 'Century Gothic', sans-serif;
-	font-weight: 400;
-	letter-spacing: 0.02em;
-	/* em, not px: this rule also covers 20px card titles, where a fixed stroke
-	   sized for a display headline would close up the counters. */
-	-webkit-text-stroke: 0.028em currentColor;
-	paint-order: stroke fill;
+	font-family: var(--font-display);
+	font-weight: 600;
+	font-variation-settings: 'opsz' 30;
+	letter-spacing: -0.015em;
+	text-wrap: balance;
 }
 
 /* Explicit type scale. Headings previously carried no font-size at all and
    fell through to the UA defaults, so the top of the hierarchy was accidental
    and sat too close to body copy. Steps are ~1.3x apart. */
-h1 { font-size: var(--text-2xl); line-height: 1.15; }
-h2 { font-size: var(--text-xl); line-height: 1.2; }
-h3 { font-size: var(--text-lg); line-height: 1.25; }
+h1 { font-size: var(--text-2xl); line-height: 1.08; }
+h2 { font-size: var(--text-xl); line-height: 1.15; }
+h3 { font-size: var(--text-lg); line-height: 1.25; font-variation-settings: 'opsz' 14; }
+
+/* Measured data only: volumes, fill percentages, batch codes, prices, counts.
+   Not a costume for "technical", these are literally measurements. */
+.data, .spec-value, .listing-card .price, .detail-price,
+.offer-row .offer-amount, .auction-current {
+	font-family: var(--font-data);
+	font-variant-numeric: tabular-nums;
+	font-feature-settings: 'zero' 1;
+}
+
+/* The label that sits above a ruled column. */
+.col-label {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+}
 
 /* Form controls do not inherit typography, so any control without an explicit
    size falls back to the UA default (13.33px for button in Chrome) and quietly
@@ -134,22 +197,19 @@ img { max-width: 100%; display: block; }
 /* Surfaces the browser draws for us. Left alone they ship system blue and grey
    into an otherwise warm palette, which is the tell that a page was assembled
    rather than built. */
-::selection {
-	background: var(--gold);
-	color: #fff;
-}
-input, textarea, select { caret-color: var(--gold-dark); }
+::selection { background: var(--ink); color: var(--paper); }
+input, textarea, select { caret-color: var(--ink); }
 
 * { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
 ::-webkit-scrollbar { width: 11px; height: 11px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-	background: var(--line);
-	border-radius: 999px;
-	/* Inset the thumb so it reads as a rail rather than a filled gutter. */
-	border: 3px solid var(--cream);
+	background: var(--rule-strong);
+	border-radius: var(--r-pill);
+	/* Inset so it reads as a rail rather than a filled gutter. */
+	border: 3px solid var(--paper);
 }
-::-webkit-scrollbar-thumb:hover { background: var(--cream-dark); }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
 
 /* Prices and bid amounts get compared column to column, so their digits need
    to line up rather than kern like prose. */
@@ -170,130 +230,128 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-	outline: 2px solid var(--gold-dark);
+	outline: 2px solid var(--ink);
 	outline-offset: 2px;
-	border-radius: var(--radius-tag);
+	border-radius: var(--r-sm);
 }
+/* The shelf inverts the ring; an ink outline vanishes on graphite. */
+.site-header a:focus-visible,
+.site-header button:focus-visible,
+.site-header input:focus-visible,
+.hero a:focus-visible,
+.hero button:focus-visible { outline-color: var(--on-shelf); }
 /* On dark or photographic backgrounds the accent-coloured ring disappears,
    so those get a light ring instead. */
 .hero-photo a:focus-visible,
 .like-btn:focus-visible,
 .thread-bubble-row.mine a:focus-visible {
-	outline-color: var(--cream);
-	box-shadow: 0 0 0 4px rgba(36, 27, 47, 0.45);
+	outline-color: var(--paper);
+	box-shadow: 0 0 0 4px rgba(22, 24, 26, 0.5);
 }
 
 .container {
-	max-width: 1440px;
+	max-width: var(--container);
 	margin: 0 auto;
-	padding: 0 var(--space-8);
+	padding: 0 var(--gutter);
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header: the shelf band ----------
+   Header and hero share one graphite field. The shelf sits above the working
+   surface; the marketplace below it is paper. */
 .site-header {
 	position: sticky;
 	top: 0;
 	z-index: 50;
-	background: var(--cream-veil);
-	backdrop-filter: blur(6px);
-	border-bottom: 1px solid var(--line);
+	background: var(--shelf);
+	color: var(--on-shelf);
+	border-bottom: 1px solid transparent;
+	transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+/* Once the page moves, the band separates from the content under it. Nothing
+   more theatrical than a hairline and a touch of opacity. */
+.site-header.is-scrolled {
+	background: rgba(22, 24, 26, 0.94);
+	backdrop-filter: saturate(140%) blur(8px);
+	border-bottom-color: var(--rule-on-shelf);
 }
 
 .site-header .header-main {
 	display: flex;
 	align-items: center;
-	height: 72px;
 	gap: var(--space-6);
+	height: 68px;
 }
 
-/* Category row sits under the main header bar, both inside the sticky area. */
-.header-categories {
-	border-top: 1px solid var(--line);
-}
-.category-row {
-	display: flex;
-	align-items: center;
-	gap: var(--space-6);
-	height: 46px;
-	overflow-x: auto;
-	scrollbar-width: none;
-}
-.category-row::-webkit-scrollbar { display: none; }
-.category-row a {
-	font-size: var(--text-sm);
-	font-weight: 500;
-	color: var(--ink);
-	white-space: nowrap;
-	padding: var(--space-1) 0;
-	border-bottom: 2px solid transparent;
-	transition: border-color 0.15s ease;
-}
-.category-row a:hover { border-bottom-color: var(--line); }
-.category-row a.active { border-bottom-color: var(--gold); }
-.category-row a.accent { color: var(--gold-dark); font-weight: 700; }
-
-/* The wordmark keeps its original Playfair Display cut; only body headings
-   moved to Poiret One. */
 .logo {
-	font-family: 'Playfair Display', Georgia, serif;
-	/* On the scale rather than beside it: at 24px the wordmark sat 1.08 from
-	   --text-xl, close enough that the two read as one size used twice. */
-	font-size: var(--text-xl);
+	font-family: var(--font-display);
 	font-weight: 700;
-	letter-spacing: 0.03em;
-	color: var(--ink);
+	font-variation-settings: 'opsz' 30;
+	font-size: var(--text-lg);
+	letter-spacing: -0.02em;
+	color: var(--on-shelf);
 	flex-shrink: 0;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	min-height: 40px;
 }
+/* The wordmark's second syllable takes the fill amber, the one place the
+   brand borrows the system's only chroma. */
+.logo span { color: var(--amber-bright); }
 
-.logo span { color: var(--gold-dark); }
-
-/* Prominent pill search: the primary way into the catalogue, so it takes the
-   centre of the header rather than sitting as a thin underline. */
+/* Search is the marketplace's spine, so it holds the centre, but at a
+   restrained height and radius rather than a full-width pill. */
 .header-search {
 	flex: 1;
-	max-width: 620px;
-	margin: 0 auto;
+	max-width: 460px;
 	display: flex;
-	align-items: center;
 	flex-direction: row-reverse;
+	align-items: center;
 	gap: var(--space-2);
-	background: var(--card);
-	border: 1.5px solid var(--ink);
-	border-radius: var(--radius-pill);
-	padding: 0 var(--space-5);
-	height: 46px;
-	transition: box-shadow 0.15s ease;
+	height: 38px;
+	padding: 0 var(--space-3);
+	background: var(--shelf-raised);
+	border: 1px solid var(--rule-on-shelf);
+	border-radius: var(--r-md);
+	transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
-.header-search:focus-within { box-shadow: 0 0 0 3px var(--cream-dark); }
+.header-search:focus-within {
+	border-color: var(--on-shelf-2);
+	background: #262a2e;
+}
 .header-search input {
 	flex: 1;
 	min-width: 0;
+	align-self: stretch;
 	border: none;
 	background: transparent;
 	padding: 0;
-	font-size: var(--text-base);
+	font-size: var(--text-sm);
+	color: var(--on-shelf);
 	outline: none;
-	font-family: inherit;
-	color: var(--ink);
 }
-.header-search input::placeholder { color: var(--ink-soft); }
+.header-search input::placeholder { color: var(--on-shelf-2); }
 .header-search button {
-	border: none;
-	background: transparent;
-	color: var(--ink);
-	padding: 0;
 	display: flex;
 	align-items: center;
+	border: none;
+	background: transparent;
+	color: var(--on-shelf-2);
+	padding: 0;
+	min-width: 24px;
+	align-self: stretch;
+	justify-content: center;
 	cursor: pointer;
 	flex-shrink: 0;
+	transition: color var(--dur-fast) var(--ease);
 }
-.header-search button svg { width: 20px; height: 20px; }
-.header-search button:hover { color: var(--gold-dark); }
+.header-search button svg { width: 16px; height: 16px; }
+.header-search:focus-within button { color: var(--on-shelf); }
 
 .header-actions {
 	display: flex;
 	align-items: center;
-	gap: var(--space-3);
+	gap: var(--space-2);
 	flex-shrink: 0;
 	margin-left: auto;
 }
@@ -305,27 +363,69 @@ textarea:focus-visible,
 	justify-content: center;
 	width: 36px;
 	height: 36px;
-	border-radius: 50%;
-	color: var(--ink-soft);
-	border: 1px solid transparent;
+	border-radius: var(--r-sm);
+	color: var(--on-shelf-2);
+	transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
 }
-.icon-link:hover { color: var(--ink); background: var(--cream-dark); }
+.icon-link:hover { color: var(--on-shelf); background: var(--shelf-raised); }
+.icon-link svg { width: 18px; height: 18px; }
 .label-short { display: none; }
 
 .icon-link .icon-count {
 	position: absolute;
-	top: -3px;
-	right: -3px;
-	background: var(--gold);
-	color: #fff;
-	font-size: var(--text-micro);
-	font-weight: 700;
+	top: 2px;
+	right: 2px;
+	background: var(--amber);
+	color: var(--shelf);
+	font-family: var(--font-data);
+	font-size: 9px;
+	font-weight: 500;
 	line-height: 1;
-	padding: var(--space-1);
-	border-radius: 999px;
-	min-width: 8px;
+	padding: 2px var(--space-1);
+	border-radius: var(--r-pill);
+	min-width: 14px;
 	text-align: center;
 }
+
+/* Category row: the taxonomy strip. Browse only, no actions. */
+.header-categories { border-top: 1px solid var(--rule-on-shelf); }
+.category-row {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	min-height: 44px;
+	padding: var(--space-3) 0;
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+.category-row::-webkit-scrollbar { display: none; }
+.category-row a {
+	position: relative;
+	font-size: var(--text-sm);
+	font-weight: 500;
+	letter-spacing: 0.01em;
+	color: var(--on-shelf-2);
+	white-space: nowrap;
+	/* Horizontal padding lifts each link over the 24px minimum target. */
+	padding: var(--space-2) var(--space-2);
+	transition: color var(--dur-fast) var(--ease);
+}
+.category-row a:hover { color: var(--on-shelf); }
+/* The active rule is drawn, not toggled: it grows from the left edge. */
+.category-row a::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	bottom: 6px;
+	height: 1px;
+	width: 100%;
+	background: var(--on-shelf);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform var(--dur) var(--ease);
+}
+.category-row a.active { color: var(--on-shelf); }
+.category-row a.active::after { transform: scaleX(1); }
 
 /* ---------- Account menu ---------- */
 .account-menu { position: relative; }
@@ -385,62 +485,53 @@ textarea:focus-visible,
 
 #account-logout { color: var(--danger); }
 
-/* ---------- Buttons ---------- */
+/* ---------- Buttons ----------
+   Rectangular with a small radius. Emphasis comes from fill and weight, not
+   from shape; the pill is reserved for status chips. */
 .btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: var(--space-2);
-	padding: var(--space-3) var(--space-6);
-	border-radius: var(--radius-pill);
+	padding: 11px var(--space-5);
+	min-height: 40px;
+	border-radius: var(--r-sm);
+	font-family: var(--font-ui);
 	font-size: var(--text-sm);
 	font-weight: 600;
 	letter-spacing: 0.01em;
 	border: 1px solid transparent;
 	cursor: pointer;
-	transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 	white-space: nowrap;
+	transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
+		border-color var(--dur-fast) var(--ease);
 }
 
-.btn:hover { transform: translateY(-1px); }
-.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--ink); color: var(--paper); }
+.btn-primary:hover { background: #000; }
 
-/* The action of the surface. */
-.btn-primary {
-	background: var(--action);
-	color: var(--cream);
-}
-.btn-primary:hover { background: var(--action-hover); }
+/* Same weight as primary, kept as its own name because the selling path is a
+   distinct destination rather than the surface's own action. */
+.btn-gold { background: var(--ink); color: var(--paper); }
+.btn-gold:hover { background: #000; }
 
-/* Reserved for the selling path, which is the product's supply-first
-   priority, so it stays visually distinct from the surface's own action. */
-.btn-gold {
-	background: var(--sell);
-	color: #fff;
-}
-.btn-gold:hover { background: var(--sell-hover); }
+.btn-outline { background: transparent; border-color: var(--rule-strong); color: var(--ink); }
+.btn-outline:hover { border-color: var(--ink); background: var(--surface); }
 
-.btn-outline {
-	background: transparent;
-	border-color: var(--ink);
-	color: var(--ink);
-}
-.btn-outline:hover { background: var(--ink); color: var(--cream); }
-
-.btn-ghost {
-	background: transparent;
-	color: var(--ink-soft);
-}
+.btn-ghost { background: transparent; color: var(--ink-2); }
 .btn-ghost:hover { color: var(--ink); }
 
-.btn-danger {
-	background: transparent;
-	border-color: var(--danger);
-	color: var(--danger);
-}
-.btn-danger:hover { background: var(--danger); color: #fff; }
+.btn-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
+.btn-danger:hover { background: var(--danger); color: var(--paper); }
 
-.btn-sm { padding: var(--space-2) var(--space-4); font-size: var(--text-sm); }
+/* On the graphite band the polarity inverts. */
+.btn-on-shelf { background: var(--paper); color: var(--ink); }
+.btn-on-shelf:hover { background: #fff; }
+.btn-ghost-shelf { background: transparent; border-color: var(--rule-on-shelf); color: var(--on-shelf); }
+.btn-ghost-shelf:hover { border-color: var(--on-shelf-2); background: var(--shelf-raised); }
+
+.btn-sm { padding: 7px var(--space-4); min-height: 34px; font-size: var(--text-sm); }
+.btn-lg { padding: 14px var(--space-7); min-height: 48px; font-size: var(--text-base); }
 .btn-block { width: 100%; }
 
 /* ---------- Demo mode banner ---------- */
@@ -454,142 +545,364 @@ textarea:focus-visible,
 }
 .demo-banner strong { font-weight: 700; }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero: the shelf ----------
+   Continuous with the header band. Asymmetric, image-forward, and built from
+   rules and columns rather than cards. */
 .hero {
-	background: linear-gradient(180deg, var(--cream) 0%, var(--cream-dark) 100%);
+	background: var(--shelf);
+	color: var(--on-shelf);
 	padding: var(--space-14) 0 var(--space-16);
 }
 .hero-grid {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-	align-items: center;
-	gap: var(--space-12);
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+	gap: clamp(var(--space-10), 5vw, var(--space-16));
+	align-items: stretch;
 }
-.hero-copy {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-}
+.hero-copy { display: flex; flex-direction: column; align-items: flex-start; }
 
-.hero h1 {
+.hero-title {
+	font-family: var(--font-display);
+	font-weight: 700;
+	font-variation-settings: 'opsz' 30;
 	font-size: var(--text-display);
-	line-height: 1.08;
-	/* Sits directly above the CTA now that the subcopy is gone. */
+	line-height: 0.98;
+	letter-spacing: -0.03em;
+	color: var(--on-shelf);
+	margin: 0 0 var(--space-6);
+	text-wrap: initial; /* the line breaks are authored */
+}
+.hero-lede {
+	color: var(--on-shelf-2);
+	font-size: var(--text-base);
+	line-height: 1.55;
+	max-width: 40ch;
 	margin: 0 0 var(--space-8);
 }
-.btn-lg { padding: var(--space-4) var(--space-8); font-size: var(--text-base); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 
-/* Fact tiles. Deliberately qualitative: this project has no real marketplace
-   volume to quote, so inventing "49M+ items" numbers is not on the table. */
-.hero-facts {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: var(--space-3);
-	margin-top: var(--space-12);
+/* The formula block. Hairline-ruled rows, term left, measured value right;
+   the same grammar the listing detail uses, introduced here. */
+.formula {
 	width: 100%;
+	max-width: 30rem;
+	/* Pushed to the bottom of the column so the two hero columns end together
+	   instead of leaving a wedge of empty shelf under the shorter one. */
+	margin: auto 0 0;
+	padding-top: var(--space-10);
+	border-top: 1px solid var(--rule-on-shelf);
 }
-.fact {
-	background: rgba(255, 255, 255, 0.55);
-	border: 1px solid var(--line);
-	border-radius: var(--radius);
-	padding: var(--space-4);
-}
-.fact svg { width: 22px; height: 22px; color: var(--gold-dark); margin-bottom: var(--space-3); }
-.fact strong { display: block; font-size: var(--text-sm); margin-bottom: var(--space-1); }
-.fact span { font-size: var(--text-sm); color: var(--ink-soft); }
-
-.hero-photo {
-	position: relative;
-	margin: 0;
-	max-width: none;
-	border-radius: var(--radius);
-	overflow: hidden;
-	transform: rotate(1.5deg);
-	box-shadow: var(--shadow-lift);
-}
-.hero-photo img {
-	width: 100%;
-	height: 100%;
-	max-height: 520px;
-	object-fit: cover;
-	display: block;
-}
-.hero-photo figcaption {
-	position: absolute;
-	bottom: 10px;
-	right: 14px;
-	font-size: var(--text-micro);
-	color: rgba(255, 255, 255, 0.85);
-	text-align: right;
-}
-.hero-photo figcaption a {
-	color: #fff;
-	text-decoration: underline;
-}
-
-/* ---------- Recently viewed (homepage) ---------- */
-.recent-section {
-	padding: var(--space-22) 0 var(--space-22);
-}
-.recent-header {
+.formula-row {
 	display: flex;
 	align-items: baseline;
 	justify-content: space-between;
 	gap: var(--space-4);
-	margin-bottom: var(--space-6);
+	padding: var(--space-3) 0;
+	border-bottom: 1px solid var(--rule-on-shelf);
 }
-.recent-header h2 { margin: 0; font-size: var(--text-xl); }
-.recent-sub { margin: 0; color: var(--ink-soft); font-size: var(--text-sm); }
+.formula dt {
+	font-size: var(--text-sm);
+	color: var(--on-shelf);
+	font-weight: 500;
+}
+.formula dd {
+	margin: 0;
+	font-size: var(--text-micro);
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--on-shelf-2);
+}
+
+/* ---------- Specimen: how Vial frames a bottle ----------
+   Hard edges, a hairline, an amber fill gauge down the left, and a measured
+   caption underneath. Used in the hero and on listing detail. */
+.specimen { margin: 0; display: flex; flex-direction: column; }
+.specimen-body { display: flex; gap: var(--space-3); flex: 1; min-height: 0; }
+.specimen-frame {
+	position: relative;
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	border-radius: var(--r-image);
+	background: var(--shelf-raised);
+}
+.specimen-frame img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+.specimen-hero .specimen-frame { min-height: 440px; }
+
+/* The gauge is the one place amber appears, and it always reports volume.
+   Ticks make it an instrument rather than a decorative stripe. */
+.fill-gauge {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--space-2);
+	flex-shrink: 0;
+}
+.fill-gauge-read {
+	font-size: var(--text-micro);
+	letter-spacing: 0.08em;
+	color: var(--amber-bright);
+	line-height: 1;
+}
+.fill-gauge-track {
+	position: relative;
+	flex: 1;
+	width: 8px;
+	background: var(--amber-track);
+	/* Quarter ticks, drawn in the track itself. */
+	background-image: linear-gradient(to bottom, var(--rule-on-shelf) 1px, transparent 1px);
+	background-size: 100% 25%;
+	border-radius: 1px;
+}
+.fill-gauge-level {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: var(--fill, 0%);
+	background: var(--amber);
+	border-radius: 1px;
+}
+
+.specimen-caption {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	margin-top: var(--space-3);
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	letter-spacing: 0.12em;
+	color: var(--on-shelf-2);
+}
+.specimen-sep {
+	width: 14px;
+	height: 1px;
+	background: var(--rule-on-shelf);
+	flex-shrink: 0;
+}
+
+/* ---------- Homepage sections ---------- */
+/* The heading rule draws along its length on arrival; a catalogue line being
+   ruled rather than a block fading in. */
+.section-head.rule-pending { border-bottom-color: transparent; position: relative; }
+.section-head.rule-pending::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	height: 1px;
+	background: var(--rule);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 620ms var(--ease);
+}
+.section-head.rule-drawn::after { transform: scaleX(1); }
+
+.section-head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-6);
+	flex-wrap: wrap;
+	padding-bottom: var(--space-4);
+	margin-bottom: var(--space-8);
+	border-bottom: 1px solid var(--rule);
+}
+.section-head h2 { margin: 0; font-size: var(--text-xl); }
+.section-sub { margin: 0; color: var(--ink-2); font-size: var(--text-sm); }
+
+/* One measured line of trust facts, sitting on a rule. Replaces the three
+   icon-and-heading cards that used to carry this. */
+.ledger-strip {
+	background: var(--paper);
+	border-bottom: 1px solid var(--rule);
+}
+.ledger-strip-inner {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: var(--space-4) var(--space-5);
+	padding: var(--space-4) var(--gutter);
+	font-family: var(--font-data);
+	font-size: var(--text-sm);
+	letter-spacing: 0.02em;
+	color: var(--ink-2);
+	text-align: center;
+}
+.ledger-dot {
+	width: 3px;
+	height: 3px;
+	background: var(--rule-strong);
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.recent-section { padding: var(--space-16) 0 var(--space-14); }
+
+/* Zero-inventory state for the homepage. A band on a rule rather than a
+   centred message adrift in empty space. */
+.cold-start {
+	grid-column: 1 / -1;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-10);
+	flex-wrap: wrap;
+	border-top: 1px solid var(--ink);
+	padding-top: var(--space-8);
+}
+.cold-start-copy h2 { margin: 0 0 var(--space-3); }
+.cold-start-copy p {
+	margin: 0;
+	color: var(--ink-2);
+	max-width: 48ch;
+	line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+	.cold-start { gap: var(--space-6); }
+	.cold-start .btn { width: 100%; }
+}
+
+/* ---------- The organ: taxonomy as an index ---------- */
+.organ {
+	padding: var(--space-16) 0 var(--space-22);
+	border-top: 1px solid var(--rule);
+}
+.organ-index {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	column-gap: var(--space-12);
+}
+.organ-row {
+	position: relative;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: baseline;
+	gap: var(--space-4);
+	padding: var(--space-4) 0;
+	border-bottom: 1px solid var(--rule);
+}
+.organ-no {
+	font-size: var(--text-micro);
+	color: var(--ink-3);
+	transition: color var(--dur) var(--ease);
+}
+.organ-name {
+	font-family: var(--font-display);
+	font-weight: 600;
+	font-variation-settings: 'opsz' 14;
+	font-size: var(--text-lg);
+	text-transform: capitalize;
+	color: var(--ink);
+	transition: transform var(--dur) var(--ease);
+	transform-origin: left;
+}
+/* The rule draws in from the left on hover: a shelf label being underlined,
+   not a card lifting. */
+.organ-rule {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	height: 1px;
+	background: var(--ink);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform var(--dur) var(--ease);
+}
+.organ-row:hover .organ-rule,
+.organ-row:focus-visible .organ-rule { transform: scaleX(1); }
+.organ-row:hover .organ-no { color: var(--ink); }
+.organ-row:hover .organ-name { transform: translateX(var(--space-2)); }
+
+/* ---------- Sell strip ---------- */
+.sell-strip {
+	background: var(--shelf);
+	color: var(--on-shelf);
+	padding: var(--space-16) 0;
+}
+.sell-strip-inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-8);
+	flex-wrap: wrap;
+}
+.sell-strip h2 { margin: 0 0 var(--space-2); color: var(--on-shelf); }
+.sell-strip .section-sub { color: var(--on-shelf-2); max-width: 52ch; }
+.sell-strip .btn-primary { background: var(--paper); color: var(--ink); }
+.sell-strip .btn-primary:hover { background: #fff; }
 
 /* ---------- Browse layout ---------- */
 .browse-layout {
 	display: grid;
-	grid-template-columns: 240px 1fr;
-	gap: var(--space-8);
-	padding: var(--space-14) 0 var(--space-22);
+	grid-template-columns: 220px 1fr;
+	gap: var(--space-12);
+	padding: var(--space-12) 0 var(--space-22);
 	align-items: start;
 }
 
 .filters {
-	background: var(--card);
-	border: 1px solid var(--line);
-	border-radius: var(--radius);
-	padding: var(--space-5);
+	background: transparent;
+	border: none;
+	border-top: 1px solid var(--ink);
+	border-radius: 0;
+	padding: var(--space-4) 0 0;
 	position: sticky;
-	top: 88px;
+	top: 124px;
 }
 
-/* Only ever shown below the layout breakpoint; see the media query. */
+/* The group labels below already announce themselves; a second heading over
+   them was redundant shouting. */
+/* The group labels below announce themselves; a visible heading over them was
+   redundant, but the landmark stays for screen readers. */
+
 .filters-toggle {
 	display: none;
 	align-items: center;
 	gap: var(--space-2);
-	background: var(--card);
-	border: 1px solid var(--line);
-	border-radius: var(--radius-pill);
+	background: transparent;
+	border: 1px solid var(--rule-strong);
+	border-radius: var(--r-sm);
 	color: var(--ink);
-	font-family: inherit;
+	font-family: var(--font-ui);
 	font-size: var(--text-sm);
 	font-weight: 600;
-	padding: var(--space-3) var(--space-5);
+	padding: var(--space-2) var(--space-4);
+	min-height: 40px;
 	cursor: pointer;
 	margin-bottom: var(--space-4);
 	align-self: start;
 }
-.filters-toggle:hover { border-color: var(--gold); }
+.filters-toggle:hover { border-color: var(--ink); }
 
-.filters h3 {
-	font-size: var(--text-micro);
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: var(--ink-soft);
-	margin: 0 0 var(--space-3);
-	font-family: 'Outfit', sans-serif;
-	font-weight: 700;
+.filter-group {
+	margin-bottom: var(--space-6);
+	padding-bottom: var(--space-6);
+	border-bottom: 1px solid var(--rule);
 }
+.filter-group:last-of-type { border-bottom: none; }
 
-.filter-group { margin-bottom: var(--space-6); }
-.filter-group:last-child { margin-bottom: 0; }
+/* Group labels share the column-label grammar used across the system. */
+.filter-group > label:first-child,
+.filter-group > label[for] {
+	display: block;
+	font-family: var(--font-ui);
+	font-size: var(--text-sm);
+	font-weight: 600;
+	letter-spacing: 0;
+	text-transform: none;
+	color: var(--ink);
+	margin-bottom: var(--space-3);
+}
 
 .filter-option {
 	display: flex;
@@ -598,169 +911,211 @@ textarea:focus-visible,
 	font-size: var(--text-sm);
 	padding: var(--space-1) 0;
 	cursor: pointer;
+	color: var(--ink-2);
+	transition: color var(--dur-fast) var(--ease);
 }
+.filter-option:hover { color: var(--ink); }
+.filter-option input { accent-color: var(--ink); width: 16px; height: 16px; flex-shrink: 0; }
+.filter-option { min-height: 28px; }
 
-.filter-option input { accent-color: var(--gold-dark); }
-
-.price-range {
-	display: flex;
-	align-items: center;
-	gap: var(--space-2);
-}
+.price-range { display: flex; align-items: center; gap: var(--space-2); }
 .price-range input {
 	width: 100%;
 	padding: var(--space-2) var(--space-3);
-	border: 1px solid var(--line);
-	border-radius: 6px;
-	font-family: inherit;
+	border: 1px solid var(--rule-strong);
+	border-radius: var(--r-sm);
+	font-family: var(--font-data);
 	font-size: var(--text-sm);
+	background: var(--surface);
 }
 
 select {
 	width: 100%;
 	padding: var(--space-2) var(--space-3);
-	border: 1px solid var(--line);
-	border-radius: 6px;
-	font-family: inherit;
+	border: 1px solid var(--rule-strong);
+	border-radius: var(--r-sm);
+	font-family: var(--font-ui);
 	font-size: var(--text-sm);
-	background: #fff;
+	background: var(--surface);
+	color: var(--ink);
 }
 
 .clear-filters {
 	margin-top: var(--space-5);
 	font-size: var(--text-sm);
-	color: var(--gold-dark);
+	color: var(--ink-2);
 	cursor: pointer;
 	text-decoration: underline;
+	text-underline-offset: 3px;
 }
+.clear-filters:hover { color: var(--ink); }
 
 .results-bar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	margin-bottom: var(--space-5);
+	gap: var(--space-4);
+	padding-bottom: var(--space-4);
+	margin-bottom: var(--space-8);
+	border-bottom: 1px solid var(--ink);
 }
-.results-count { color: var(--ink-soft); font-size: var(--text-sm); }
+.results-count {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--ink-2);
+}
+.results-bar select { width: auto; }
 
-/* ---------- Listing grid & card ---------- */
+/* ---------- Listing grid & card ----------
+   Photography carries the card. No border, no shadow, no lift: the frame is
+   the object and the metadata sits under it on a rule, like a plate caption. */
 .listing-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-	gap: var(--space-5);
+	grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
+	gap: var(--space-10) var(--space-6);
 }
 
 .listing-card {
 	position: relative;
-	background: var(--card);
-	border: 1px solid var(--line);
-	border-radius: var(--radius);
-	overflow: hidden;
-	transition: box-shadow 0.25s ease, transform 0.25s ease;
 	display: flex;
 	flex-direction: column;
-}
-.listing-card:hover {
-	box-shadow: var(--shadow-lift);
-	transform: translateY(-4px);
+	background: transparent;
+	border: none;
+	border-radius: 0;
 }
 
 .listing-card .thumb {
-	aspect-ratio: 1 / 1;
-	background: linear-gradient(135deg, var(--cream-dark), #fff);
+	position: relative;
+	aspect-ratio: 4 / 5;
+	overflow: hidden;
+	background: var(--surface);
+	border-radius: var(--r-image);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: var(--ink-soft);
-	position: relative;
-	overflow: hidden;
+	color: var(--ink-3);
 }
-
 .listing-card .thumb img {
-	transition: transform 0.7s cubic-bezier(.16,1,.3,1);
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform var(--dur-slow) var(--ease);
 }
-.listing-card:hover .thumb img {
-	transform: scale(1.07);
-}
+/* Controlled zoom inside a fixed frame: the card never moves, only the image. */
+.listing-card:hover .thumb img { transform: scale(1.025); }
+.thumb-icon svg { width: 34%; height: 34%; }
 
-.thumb-icon svg { width: 40%; height: 40%; }
+/* Card gauge: same instrument as the hero, sized down and laid along the
+   bottom edge of the frame where it cannot be mistaken for a border. */
+.card-gauge {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 5px;
+	background: rgba(22, 24, 26, 0.16);
+	box-shadow: inset 0 1px 0 rgba(22, 24, 26, 0.12);
+}
+.card-gauge span {
+	display: block;
+	height: 100%;
+	width: var(--fill, 0%);
+	background: var(--amber);
+}
 
 .like-btn {
 	position: absolute;
-	top: 10px;
-	right: 10px;
+	top: var(--space-2);
+	right: var(--space-2);
 	z-index: 2;
 	width: 32px;
 	height: 32px;
-	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.9);
-	border: 1px solid var(--line);
-	color: var(--ink-soft);
+	border-radius: var(--r-sm);
+	background: rgba(248, 248, 245, 0.92);
+	border: none;
+	color: var(--ink-2);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
+	opacity: 0;
+	transition: opacity var(--dur) var(--ease), color var(--dur-fast) var(--ease);
 }
-.like-btn:hover { color: var(--gold-dark); }
-.like-btn.active { color: var(--gold); border-color: var(--gold); }
+.listing-card:hover .like-btn,
+.like-btn:focus-visible,
+.like-btn.active { opacity: 1; }
+.like-btn:hover { color: var(--ink); }
+.like-btn.active { color: var(--ink); }
+/* Touch has no hover, so the control stays visible there. */
+@media (hover: none) { .like-btn { opacity: 1; } }
 
 .badge {
 	position: absolute;
-	top: 10px;
-	left: 10px;
-	background: rgba(36, 27, 47, 0.85);
-	color: #fff;
-	font-size: var(--text-micro);
-	font-weight: 600;
+	top: var(--space-2);
+	left: var(--space-2);
+	background: var(--shelf);
+	color: var(--on-shelf);
+	font-family: var(--font-data);
+	font-size: 10px;
+	font-weight: 500;
 	padding: var(--space-1) var(--space-2);
-	border-radius: var(--radius-tag);
+	border-radius: var(--r-sm);
 	text-transform: uppercase;
-	letter-spacing: 0.04em;
+	letter-spacing: 0.1em;
 }
 .badge.sold { background: var(--danger); }
 
-.listing-card .info { padding: var(--space-4); }
-.listing-card .brand { font-size: var(--text-micro); text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold-dark); font-weight: 700; }
-.listing-card .name { font-family: 'Poiret One', 'Century Gothic', sans-serif; font-size: var(--text-base); margin: var(--space-1) 0 var(--space-2); }
-.listing-card .meta { font-size: var(--text-micro); color: var(--ink-soft); display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-2); }
+.listing-card .info {
+	padding: var(--space-3) 0 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-1);
+}
+.listing-card .brand {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	color: var(--ink-3);
+}
+.listing-card .meta {
+	display: flex;
+	gap: var(--space-2);
+	flex-wrap: wrap;
+	align-items: center;
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	letter-spacing: 0.06em;
+	color: var(--ink-2);
+	margin: var(--space-1) 0 var(--space-2);
+}
+/* Card metadata reads as a measured line, not a row of chips. */
+.listing-card .meta .chip {
+	background: none;
+	padding: 0;
+	border-radius: 0;
+	font-size: inherit;
+}
+.listing-card .meta .chip + .chip::before {
+	content: '·';
+	margin-right: var(--space-2);
+	color: var(--rule-strong);
+}
+.listing-card .price {
+	font-size: var(--text-base);
+	font-weight: 500;
+	color: var(--ink);
+}
+
 .chip {
+	display: inline-block;
 	background: var(--cream-dark);
 	padding: var(--space-1) var(--space-2);
-	border-radius: var(--radius-tag);
+	border-radius: var(--r-pill);
 	font-size: var(--text-micro);
-}
-.listing-card .price { font-size: var(--text-lg); font-weight: 700; }
-
-/* Lede under a page title. Held to a readable measure rather than running the
-   full panel width. */
-.page-lede {
-	color: var(--ink-soft);
-	max-width: 62ch;
-	margin: 0 0 var(--space-7);
-	line-height: 1.55;
-}
-
-/* Marks a field as skippable inline, so required is the quiet default and
-   optional is the thing that gets said out loud. */
-.label-optional {
-	font-weight: 500;
-	font-size: var(--text-micro);
-	color: var(--ink-soft);
-	text-transform: none;
-	letter-spacing: 0;
-	margin-left: var(--space-2);
-}
-
-/* Small-caps section label. Carried as a heading element so the document
-   outline is real, with the display face and scale overridden back down. */
-.section-title {
-	font-family: 'Outfit', system-ui, sans-serif;
-	font-size: var(--text-micro);
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: var(--ink-soft);
-	margin: 0 0 var(--space-4);
-	-webkit-text-stroke: 0;
+	letter-spacing: 0.04em;
 }
 
 /* ---------- Empty, gated and error states ---------- */
@@ -773,10 +1128,10 @@ select {
 	flex-direction: column;
 	align-items: center;
 	text-align: center;
-	padding: var(--space-12) var(--space-5);
-	color: var(--ink-soft);
+	padding: var(--space-10) var(--space-5);
+	color: var(--ink-2);
 }
-.empty-state.is-feature { padding: var(--space-22) var(--space-5) var(--space-22); }
+.empty-state.is-feature { padding: var(--space-16) var(--space-5); }
 
 .empty-icon {
 	display: block;
@@ -826,99 +1181,155 @@ select {
 	text-underline-offset: 3px;
 }
 
-/* ---------- Listing detail ---------- */
+/* ---------- Listing detail ----------
+   The densest specimen treatment in the product. The spec block uses the same
+   ruled formula grammar the hero introduces. */
 .listing-detail {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: var(--space-12);
-	padding: var(--space-14) 0 var(--space-22);
+	grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+	gap: clamp(var(--space-8), 4vw, var(--space-14));
+	padding: var(--space-12) 0 var(--space-22);
 }
 
 .gallery-main {
-	aspect-ratio: 1 / 1;
-	background: linear-gradient(135deg, var(--cream-dark), #fff);
-	border-radius: var(--radius);
+	aspect-ratio: 4 / 5;
+	background: var(--surface);
+	border-radius: var(--r-image);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: var(--ink-soft);
-	border: 1px solid var(--line);
+	color: var(--ink-3);
+	overflow: hidden;
 	margin-bottom: var(--space-3);
-	overflow: hidden;
 }
-.gallery-main .thumb-icon svg { width: 70px; height: 70px; }
+.gallery-main img { width: 100%; height: 100%; object-fit: cover; }
+.gallery-main .thumb-icon svg { width: 72px; height: 72px; }
 
-.gallery-thumbs { display: flex; gap: var(--space-3); }
+.gallery-thumbs { display: flex; gap: var(--space-2); }
 .gallery-thumbs .t {
-	width: 64px;
-	height: 64px;
-	border-radius: 8px;
+	width: 60px;
+	height: 60px;
+	border-radius: var(--r-image);
 	overflow: hidden;
-	background: var(--cream-dark);
-	border: 1px solid var(--line);
-	color: var(--ink-soft);
+	background: var(--surface);
+	border: 1px solid transparent;
+	color: var(--ink-3);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
+	transition: border-color var(--dur-fast) var(--ease);
 }
-.gallery-thumbs .t .thumb-icon svg { width: 24px; height: 24px; }
-.gallery-thumbs .t.active { border-color: var(--gold); }
+.gallery-thumbs .t .thumb-icon svg { width: 22px; height: 22px; }
+.gallery-thumbs .t.active { border-color: var(--ink); }
 
-.detail-brand { color: var(--gold-dark); text-transform: uppercase; letter-spacing: 0.08em; font-size: var(--text-sm); font-weight: 700; }
-.detail-title { font-size: var(--text-2xl); margin: var(--space-2) 0 var(--space-4); }
-.detail-price { font-size: var(--text-xl); font-weight: 700; margin-bottom: var(--space-5); }
-
-.spec-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: var(--space-3) var(--space-5);
-	background: var(--card);
-	border: 1px solid var(--line);
-	border-radius: var(--radius);
-	padding: var(--space-5) var(--space-5);
+.detail-brand {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	text-transform: uppercase;
+	letter-spacing: 0.14em;
+	color: var(--ink-3);
+}
+.detail-title {
+	font-size: var(--text-2xl);
+	line-height: 1.05;
+	margin: var(--space-2) 0 var(--space-4);
+}
+.detail-price {
+	font-size: var(--text-xl);
+	font-weight: 500;
 	margin-bottom: var(--space-6);
 }
-.spec-grid .spec-label { font-size: var(--text-micro); text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); }
-.spec-grid .spec-value { font-size: var(--text-sm); font-weight: 600; }
+
+/* The formula block again: term left, measured value right, hairline between.
+   No card, no fill, no grid of boxes. */
+.spec-grid {
+	display: block;
+	background: none;
+	border: none;
+	border-top: 1px solid var(--ink);
+	border-radius: 0;
+	padding: 0;
+	margin-bottom: var(--space-7);
+}
+.spec-grid > div {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-4);
+	padding: var(--space-3) 0;
+	border-bottom: 1px solid var(--rule);
+}
+.spec-grid .spec-label {
+	font-size: var(--text-sm);
+	color: var(--ink-2);
+	text-transform: none;
+	letter-spacing: 0;
+}
+.spec-grid .spec-value {
+	font-family: var(--font-data);
+	font-size: var(--text-sm);
+	font-weight: 500;
+	color: var(--ink);
+	text-align: right;
+}
 
 .notes-tags { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-6); }
-.notes-tags .chip { background: var(--cream-dark); font-size: var(--text-micro); padding: var(--space-1) var(--space-3); }
+.notes-tags .chip {
+	background: transparent;
+	border: 1px solid var(--rule-strong);
+	color: var(--ink-2);
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	padding: var(--space-1) var(--space-3);
+	border-radius: var(--r-pill);
+}
 
 .detail-description {
-	color: var(--ink-soft);
+	color: var(--ink-2);
 	max-width: 68ch;
-	line-height: 1.6;
-	margin-bottom: var(--space-6);
+	line-height: 1.65;
+	margin-bottom: var(--space-7);
 	white-space: pre-wrap;
 }
 
-.action-row { display: flex; gap: var(--space-3); margin-bottom: var(--space-7); }
+.action-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-8); }
 
+/* Seller identity sits on a rule, not inside a panel: this is a line of
+   provenance, not a widget. */
 .seller-card {
 	display: flex;
 	align-items: center;
 	gap: var(--space-4);
-	background: var(--card);
-	border: 1px solid var(--line);
-	border-radius: var(--radius);
-	padding: var(--space-4);
+	background: none;
+	border: none;
+	border-top: 1px solid var(--rule);
+	border-radius: 0;
+	padding: var(--space-4) 0 0;
 }
 .avatar {
-	width: 46px;
-	height: 46px;
+	width: 42px;
+	height: 42px;
 	border-radius: 50%;
-	background: var(--gold);
-	color: #fff;
+	background: var(--shelf);
+	color: var(--on-shelf);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-weight: 700;
-	font-family: 'Poiret One', 'Century Gothic', sans-serif;
+	font-family: var(--font-display);
+	font-weight: 600;
 	flex-shrink: 0;
+	object-fit: cover;
 }
-.seller-name { font-weight: 700; }
-.seller-loc { font-size: var(--text-sm); color: var(--ink-soft); }
+.seller-name { font-weight: 600; font-size: var(--text-sm); }
+.seller-loc {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	letter-spacing: 0.06em;
+	color: var(--ink-3);
+}
 
 /* ---------- Forms / auth / sell ---------- */
 .form-page {
@@ -1000,7 +1411,15 @@ select {
 .form-msg.success { background: #e9f5ec; color: var(--success); }
 
 .auth-toggle { text-align: center; margin-top: var(--space-5); font-size: var(--text-sm); color: var(--ink-soft); }
-.auth-toggle a { color: var(--gold-dark); font-weight: 600; cursor: pointer; }
+.auth-toggle a {
+	color: var(--ink);
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	display: inline-block;
+	padding: var(--space-2) var(--space-1);
+}
 
 /* ---------- Profile page ---------- */
 .profile-header {
@@ -1017,7 +1436,7 @@ select {
 }
 .profile-meta { color: var(--ink-soft); font-size: var(--text-sm); }
 .profile-stats { display: flex; gap: var(--space-6); margin-top: var(--space-3); font-size: var(--text-sm); }
-.profile-stats b { font-family: 'Poiret One', 'Century Gothic', sans-serif; font-size: var(--text-base); display: block; }
+.profile-stats b { font-family: var(--font-data); font-size: var(--text-base); display: block; }
 
 hr.divider { border: none; border-top: 1px solid var(--line); margin: var(--space-7) 0; }
 
@@ -1035,12 +1454,10 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: var(--spac
 	gap: var(--space-4);
 	flex-wrap: wrap;
 }
-.footer-logo { font-size: var(--text-base); }
+/* The wordmark's default colour belongs to the shelf; on paper it inverts. */
+.footer-logo { font-size: var(--text-base); color: var(--ink); }
+.footer-logo span { color: var(--ink-2); }
 .footer-tag { color: var(--ink-soft); }
-
-@media (max-width: 640px) {
-	.footer-inner { flex-direction: column; text-align: center; }
-}
 
 /* ---------- Misc ---------- */
 .skeleton {
@@ -1201,7 +1618,7 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: var(--spac
 	margin-bottom: var(--space-3);
 	background: var(--card);
 }
-.offer-row .offer-amount { font-family: 'Poiret One', 'Century Gothic', sans-serif; font-size: var(--text-xl); font-weight: 400; }
+.offer-row .offer-amount { font-family: var(--font-data); font-size: var(--text-lg); font-weight: 500; }
 .offer-row .offer-meta { font-size: var(--text-sm); color: var(--ink-soft); margin-top: var(--space-1); }
 .offer-row .offer-actions { display: flex; gap: var(--space-2); flex-shrink: 0; }
 .offer-status { font-size: var(--text-micro); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: var(--space-1) var(--space-3); border-radius: var(--radius-tag); }
@@ -1229,7 +1646,7 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: var(--spac
 	border-radius: var(--radius-tag);
 	margin-bottom: var(--space-3);
 }
-.auction-current { font-family: 'Poiret One', 'Century Gothic', sans-serif; font-size: var(--text-xl); font-weight: 400; }
+.auction-current { font-family: var(--font-data); font-size: var(--text-lg); font-weight: 500; }
 .auction-sub { font-size: var(--text-sm); color: var(--ink-soft); margin: var(--space-1) 0 var(--space-4); }
 .bid-row { display: flex; gap: var(--space-3); }
 .bid-row input {
@@ -1243,45 +1660,72 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: var(--spac
 .bid-history { margin-top: var(--space-4); font-size: var(--text-sm); color: var(--ink-soft); }
 .bid-history-row { display: flex; justify-content: space-between; padding: var(--space-1) 0; }
 
-@media (max-width: 860px) {
+/* ---------- Responsive ----------
+   Structural reflow rather than shrinking: the hero stacks image-first, the
+   organ index steps down in columns, and the filter panel collapses. */
+
+/* Laptop */
+@media (max-width: 1180px) {
+	.hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr); }
+	.hero-title { font-size: clamp(2.4rem, 5vw, 3.6rem); }
+	.organ-index { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-10); }
+	.browse-layout { grid-template-columns: 200px 1fr; gap: var(--space-8); }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+	.hero { padding: var(--space-10) 0 var(--space-12); }
+	.hero-grid { grid-template-columns: 1fr; gap: var(--space-10); }
+	/* Image leads on narrow screens; the headline reads better under it than
+	   squeezed beside it. */
+	.specimen-hero { order: -1; }
+	.specimen-hero .specimen-frame { min-height: 0; aspect-ratio: 16 / 10; max-height: 46vh; }
+	.formula { max-width: none; margin-top: var(--space-8); padding-top: var(--space-8); }
+	.hero-title { font-size: clamp(2.2rem, 7vw, 3.2rem); }
+
 	.browse-layout { grid-template-columns: 1fr; }
-	.filters { position: static; }
-	/* Collapsed by default so the results are the first thing below the header. */
+	.filters { position: static; border-top: none; }
 	.filters-toggle { display: inline-flex; }
 	.filters { display: none; }
-	.filters.is-open { display: block; }
+	.filters.is-open { display: block; border-top: 1px solid var(--ink); }
+
 	.listing-detail { grid-template-columns: 1fr; gap: var(--space-7); }
 	.form-grid-2 { grid-template-columns: 1fr; }
 	.messages-layout { grid-template-columns: 1fr; height: auto; }
 	.conversation-list { max-height: 220px; }
 	.thread-pane { height: 480px; }
-	.hero-grid { grid-template-columns: 1fr; gap: var(--space-8); }
-	.hero-photo { order: -1; transform: none; }
-	.hero-photo img { max-height: 300px; }
+	.sell-strip-inner { flex-direction: column; align-items: flex-start; }
 }
 
+/* Mobile */
 @media (max-width: 640px) {
 	.site-header .header-main {
 		flex-wrap: wrap;
 		height: auto;
 		padding-top: var(--space-3);
 		padding-bottom: var(--space-3);
-		row-gap: var(--space-2);
+		row-gap: var(--space-3);
 	}
 	.logo { order: 1; }
-	.header-actions { order: 2; margin-left: auto; flex-wrap: nowrap; }
-	/* Search drops to its own full-width row; the category row below the
-	   header still carries navigation, so nothing gets stranded. */
-	.header-search { order: 3; flex-basis: 100%; max-width: none; height: 42px; }
-	.header-search input { font-size: var(--text-sm); }
+	.header-actions { order: 2; margin-left: auto; }
+	/* Search takes its own full-width row; the taxonomy strip below the header
+	   still carries browse, so nothing is stranded. */
+	.header-search { order: 3; flex-basis: 100%; max-width: none; }
 	.header-actions .btn-sm { padding: var(--space-2) var(--space-3); }
 	.label-full { display: none; }
 	.label-short { display: inline; }
-	.hero { padding: var(--space-8) 0 var(--space-12); }
-	.hero-copy { align-items: stretch; }
-	.hero h1 { font-size: clamp(2rem, 8.5vw, 2.6rem); }
-	.hero-facts { grid-template-columns: 1fr; }
-	.hero-copy .btn-lg { width: 100%; }
+
+	.hero-title { font-size: clamp(2rem, 9vw, 2.6rem); }
+	.hero-actions { width: 100%; }
+	.hero-actions .btn { flex: 1; }
+	.organ-index { grid-template-columns: 1fr; }
+	.recent-section { padding: var(--space-14) 0 var(--space-12); }
+	.organ, .sell-strip { padding: var(--space-12) 0; }
+	.listing-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-7) var(--space-4); }
+	.section-head { margin-bottom: var(--space-6); }
+	.ledger-strip-inner { flex-direction: column; gap: var(--space-2); }
+	.ledger-dot { display: none; }
+	.footer-inner { flex-direction: column; text-align: center; gap: var(--space-3); }
 }
 
 /* ---------- Reduced motion ---------- */

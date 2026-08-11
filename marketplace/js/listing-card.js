@@ -22,14 +22,16 @@ export function renderListingCard(listing) {
 				<div class="thumb">
 					${listing.status === 'sold' ? '<span class="badge sold">Sold</span>' : listing.is_auction ? '<span class="badge">Auction</span>' : ''}
 					${renderThumbImage(listing.images?.[0])}
+					<span class="card-gauge" style="--fill:${Number(listing.fill_percentage) || 0}%"
+						role="img" aria-label="${Number(listing.fill_percentage) || 0} percent remaining"><span></span></span>
 				</div>
 				<div class="info">
 					<div class="brand">${escapeHtml(listing.brand)}</div>
 					<div class="name">${escapeHtml(listing.name)}</div>
 					<div class="meta">
-						<span class="chip">${listing.size_ml}ml</span>
-						<span class="chip">${listing.fill_percentage}% full</span>
-						<span class="chip chip-condition" data-condition="${escapeHtml(listing.condition)}">${conditionLabel(listing.condition)}</span>
+						<span class="chip">${listing.size_ml} ml</span>
+						<span class="chip">${listing.fill_percentage}% left</span>
+						<span class="chip">${conditionLabel(listing.condition)}</span>
 					</div>
 					<div class="price">$${Number(listing.price).toFixed(0)}</div>
 				</div>

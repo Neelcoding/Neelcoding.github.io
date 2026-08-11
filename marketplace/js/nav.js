@@ -3,10 +3,13 @@ import { isSupabaseConfigured } from './supabase-client.js';
 import { getCurrentUser, getProfile, getUnreadConversationCount, signOut } from './db.js';
 import { iconHeart, ICON_BAG, ICON_MESSAGE, renderAvatar } from './icons.js';
 import { getLikedIds, getBagIds } from './wishlist.js';
-import { heroEntrance } from './motion.js';
+import { heroEntrance, drawRules } from './motion.js';
 
 // Category row under the main header. Every entry maps to a filter browse.js
 // actually understands, so none of these are decorative.
+/* Browse taxonomy only. Selling used to appear here as well as in the header
+   actions, which gave the page two competing sell affordances; the row is now
+   purely a way into the catalogue. */
 const CATEGORIES = [
 	{ label: 'All', href: 'browse.html' },
 	{ label: 'Men', href: 'browse.html?gender=men' },
@@ -14,7 +17,6 @@ const CATEGORIES = [
 	{ label: 'Unisex', href: 'browse.html?gender=unisex' },
 	{ label: 'Auctions', href: 'browse.html?auction=1' },
 	{ label: 'Under $50', href: 'browse.html?max=50' },
-	{ label: 'Sell', href: 'sell.html', accent: true },
 ];
 
 function renderCategoryNav() {
@@ -27,7 +29,7 @@ function renderCategoryNav() {
 		const [cPage, cQuery = ''] = c.href.split('?');
 		// "All" should only light up on a bare browse page, not every filtered view.
 		const isActive = cPage === page && (cQuery ? search === `?${cQuery}` : !search);
-		return `<a href="${c.href}" class="${isActive ? 'active' : ''}${c.accent ? ' accent' : ''}">${c.label}</a>`;
+		return `<a href="${c.href}" class="${isActive ? 'active' : ''}">${c.label}</a>`;
 	}).join('')}</nav>`;
 }
 
@@ -49,7 +51,7 @@ async function renderHeaderActions() {
 	const displayName = profile?.display_name || profile?.username || user?.username || user?.email || 'Account';
 
 	el.innerHTML = `
-		<a href="sell.html" class="btn btn-gold btn-sm"><span class="label-full">+ List an item</span><span class="label-short">+ Sell</span></a>
+		<a href="sell.html" class="btn btn-on-shelf btn-sm">Sell a bottle</a>
 		<a href="browse.html?view=liked" class="icon-link" aria-label="Liked items" title="Liked">
 			${iconHeart(false)}${likedCount ? `<span class="icon-count">${likedCount}</span>` : ''}
 		</a>
@@ -75,7 +77,7 @@ async function renderHeaderActions() {
 					<button id="account-logout">Log out</button>
 				</div>
 			</div>
-		` : `<a href="account.html" class="btn btn-outline btn-sm">Sign up</a>`}
+		` : `<a href="account.html" class="btn btn-ghost-shelf btn-sm">Sign in</a>`}
 	`;
 
 	wireAccountMenu();
@@ -120,11 +122,29 @@ function wireHeaderSearch() {
 	});
 }
 
+function wireStickyHeader() {
+	const header = document.querySelector('.site-header');
+	if (!header) return;
+	let ticking = false;
+	const update = () => {
+		header.classList.toggle('is-scrolled', window.scrollY > 8);
+		ticking = false;
+	};
+	window.addEventListener('scroll', () => {
+		if (ticking) return;
+		ticking = true;
+		requestAnimationFrame(update);
+	}, { passive: true });
+	update();
+}
+
 renderDemoBanner();
 renderCategoryNav();
+wireStickyHeader();
 renderHeaderActions();
 wireHeaderSearch();
 heroEntrance();
+drawRules();
 document.addEventListener('fm:counts-changed', renderHeaderActions);
 
 export { renderHeaderActions };

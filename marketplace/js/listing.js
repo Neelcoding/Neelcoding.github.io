@@ -54,6 +54,7 @@ async function render() {
 			body: 'That link is missing a listing, so there is nothing to show.',
 			actions: [{ label: 'Browse bottles', href: 'browse.html' }],
 			feature: true,
+			heading: 'h1',
 		});
 		return;
 	}
@@ -65,6 +66,7 @@ async function render() {
 			body: 'The seller removed this listing, or the link is wrong.',
 			actions: [{ label: 'Browse bottles', href: 'browse.html' }],
 			feature: true,
+			heading: 'h1',
 		});
 		return;
 	}

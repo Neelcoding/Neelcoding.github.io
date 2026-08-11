@@ -44,6 +44,7 @@ async function render() {
 			body: 'That link is missing a seller, so there is nothing to show.',
 			actions: [{ label: 'Browse bottles', href: 'browse.html' }],
 			feature: true,
+			heading: 'h1',
 		});
 		return;
 	}
@@ -55,6 +56,7 @@ async function render() {
 			body: 'The account may have been removed, or the link may be wrong.',
 			actions: [{ label: 'Browse bottles', href: 'browse.html' }],
 			feature: true,
+			heading: 'h1',
 		});
 		return;
 	}

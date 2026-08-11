@@ -37,8 +37,12 @@ function escapeHtml(str) {
  * @param {Array}  [opts.actions] [{ label, href, variant }], first is primary
  * @param {boolean}[opts.feature] true for a page's main empty space, false for
  *                                a panel or an error, which should stay compact
+ * @param {'h1'|'h2'} [opts.heading] heading level. h2 by default, because most
+ *   empty states sit inside a page that already owns its h1; only a state that
+ *   IS the whole page should claim h1.
  */
-export function renderEmptyState({ icon, title, body, actions = [], feature = false }) {
+export function renderEmptyState({ icon, title, body, actions = [], feature = false, heading = 'h2' }) {
+	const H = heading === 'h1' ? 'h1' : 'h2';
 	const buttons = actions
 		.map((a, i) => {
 			const variant = a.variant || (i === 0 ? 'btn-primary' : 'btn-outline');
@@ -49,7 +53,7 @@ export function renderEmptyState({ icon, title, body, actions = [], feature = fa
 	return `
 		<div class="empty-state${feature ? ' is-feature' : ''}">
 			${icon && EMPTY_ICONS[icon] ? `<span class="empty-icon">${EMPTY_ICONS[icon]}</span>` : ''}
-			<h2 class="empty-title">${escapeHtml(title)}</h2>
+			<${H} class="empty-title">${escapeHtml(title)}</${H}>
 			${body ? `<p class="empty-body">${escapeHtml(body)}</p>` : ''}
 			${buttons ? `<div class="empty-actions">${buttons}</div>` : ''}
 		</div>
@@ -67,5 +71,6 @@ export function renderSignedOut({ title, body }) {
 		body,
 		actions: [{ label: 'Sign in or create an account', href: 'account.html' }],
 		feature: true,
+		heading: 'h1',
 	});
 }

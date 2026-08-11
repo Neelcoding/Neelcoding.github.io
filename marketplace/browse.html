@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>Browse - Vial</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&family=Playfair+Display:wght@700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+	<link href="https://fonts.googleapis.com/css2?family=Piazzolla:opsz,wght@8..30,400..800&family=Archivo:wght@400..700&family=Azeret+Mono:wght@400;500&display=swap" rel="stylesheet" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 	<link rel="stylesheet" href="css/marketplace.css" />
@@ -27,41 +27,42 @@
 	</header>
 
 	<main class="container">
-		<div class="browse-layout">
+		<h1 class="sr-only">Browse fragrances</h1>
+			<div class="browse-layout">
 			<button type="button" class="filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="filters">
 				<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="17" x2="14" y2="17"/></svg>
 				<span>Filters</span>
 			</button>
 			<aside class="filters" id="filters">
-				<h3>Filters</h3>
+				<h2 class="sr-only">Filters</h2>
 
 				<div class="filter-group">
-					<label for="f-brand" style="font-size:12px;font-weight:600;">Brand</label>
+					<label for="f-brand">Brand</label>
 					<select id="f-brand">
 						<option value="">All brands</option>
 					</select>
 				</div>
 
 				<div class="filter-group">
-					<label style="font-size:12px;font-weight:600;">Gender</label>
-					<div id="f-gender"></div>
+					<label id="f-gender-label">Gender</label>
+					<div id="f-gender" role="radiogroup" aria-labelledby="f-gender-label"></div>
 				</div>
 
 				<div class="filter-group">
-					<label style="font-size:12px;font-weight:600;">Condition</label>
+					<label for="f-condition">Condition</label>
 					<select id="f-condition">
 						<option value="">Any condition</option>
 					</select>
 				</div>
 
 				<div class="filter-group">
-					<label style="font-size:12px;font-weight:600;">Scent family</label>
-					<div id="f-notes"></div>
+					<label id="f-notes-label">Scent family</label>
+					<div id="f-notes" role="group" aria-labelledby="f-notes-label"></div>
 				</div>
 
 				<div class="filter-group">
-					<label style="font-size:12px;font-weight:600;">Price</label>
-					<div class="price-range">
+					<label id="f-price-label">Price</label>
+					<div class="price-range" role="group" aria-labelledby="f-price-label">
 						<input type="number" id="f-min" placeholder="Min" min="0" />
 						<span>–</span>
 						<input type="number" id="f-max" placeholder="Max" min="0" />
@@ -74,7 +75,7 @@
 			<div>
 				<div class="results-bar">
 					<div class="results-count" id="results-count">Loading listings…</div>
-					<select id="f-sort" style="width:auto;">
+					<select id="f-sort" aria-label="Sort listings">
 						<option value="newest">Newest first</option>
 						<option value="price_asc">Price: low to high</option>
 						<option value="price_desc">Price: high to low</option>

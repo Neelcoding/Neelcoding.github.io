@@ -1,7 +1,7 @@
 import { getListings, SCENT_FAMILIES, CONDITIONS } from './db.js';
 import { MOCK_LISTINGS } from './mock-data.js';
 import { getLikedIds, getBagIds } from './wishlist.js';
-import { revealOnScroll } from './motion.js';
+import { revealOnScroll, fillGauges } from './motion.js';
 import { renderListingCard, wireLikeButtons } from './listing-card.js';
 import { renderEmptyState } from './empty-state.js';
 
@@ -194,6 +194,7 @@ async function render() {
 		}
 		grid.innerHTML = listings.map(renderListingCard).join('');
 		revealOnScroll('.listing-card');
+		fillGauges(grid);
 	} catch (err) {
 		resultsCount.textContent = 'Something went wrong loading listings.';
 		console.error(err);

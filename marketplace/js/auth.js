@@ -26,11 +26,11 @@ function renderAuthForms() {
 			<div id="form-msg"></div>
 			<form id="login-form">
 				<div class="form-row">
-					<label>Email</label>
+					<label for="login-email">Email</label>
 					<input type="email" id="login-email" required />
 				</div>
 				<div class="form-row">
-					<label>Password</label>
+					<label for="login-password">Password</label>
 					<input type="password" id="login-password" required minlength="6" />
 				</div>
 				<button class="btn btn-primary btn-block" type="submit">Sign in</button>
@@ -68,11 +68,11 @@ function renderSignupForm() {
 					<input type="text" id="signup-username" required />
 				</div>
 				<div class="form-row">
-					<label>Email</label>
+					<label for="login-email">Email</label>
 					<input type="email" id="signup-email" required />
 				</div>
 				<div class="form-row">
-					<label>Password</label>
+					<label for="login-password">Password</label>
 					<input type="password" id="signup-password" required minlength="6" />
 				</div>
 				<button class="btn btn-primary btn-block" type="submit">Create account</button>
