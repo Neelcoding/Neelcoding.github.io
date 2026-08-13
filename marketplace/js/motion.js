@@ -71,13 +71,11 @@ export function heroEntrance() {
 		fillGauges();
 		return;
 	}
-	const lede = document.querySelector('.hero-lede');
 	const actions = document.querySelector('.hero-actions');
-	const rows = [...document.querySelectorAll('.formula-row')];
 	const specimen = document.querySelector('.specimen-hero .specimen-frame');
 	const caption = document.querySelector('.specimen-hero .specimen-caption');
 
-	const fading = [title, lede, actions, caption, ...rows].filter(Boolean);
+	const fading = [title, actions, caption].filter(Boolean);
 	gsap.set(fading, { opacity: 0, y: 14 });
 	if (specimen) gsap.set(specimen, { opacity: 0, scale: 1.02 });
 	setTimeout(() => forceVisible([...fading, specimen].filter(Boolean)), 2200);
@@ -89,11 +87,8 @@ export function heroEntrance() {
 		// it reads as one composition with the headline.
 		tl.to(specimen, { opacity: 1, scale: 1, duration: 0.8 }, 0.08);
 	}
-	if (lede) tl.to(lede, { opacity: 1, y: 0, duration: 0.5 }, '-=0.62');
-	if (actions) tl.to(actions, { opacity: 1, y: 0, duration: 0.5 }, '-=0.42');
-	if (caption) tl.to(caption, { opacity: 1, y: 0, duration: 0.45 }, '-=0.42');
-	// Formula rows come in as a short cascade, like a column being read down.
-	if (rows.length) tl.to(rows, { opacity: 1, y: 0, duration: 0.4, stagger: 0.045 }, '-=0.35');
+	if (actions) tl.to(actions, { opacity: 1, y: 0, duration: 0.5 }, '-=0.55');
+	if (caption) tl.to(caption, { opacity: 1, y: 0, duration: 0.45 }, '-=0.4');
 
 	tl.add(() => fillGauges(), '-=0.5');
 }

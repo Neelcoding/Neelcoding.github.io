@@ -1,4 +1,4 @@
-import { getListings, getListingsByIds, SCENT_FAMILIES, CONDITIONS } from './db.js';
+import { getListings, getListingsByIds, SCENT_FAMILIES } from './db.js';
 import { getRecentIds } from './recently-viewed.js';
 import { renderListingCard, wireLikeButtons } from './listing-card.js';
 import { revealOnScroll, fillGauges } from './motion.js';
@@ -8,30 +8,6 @@ const grid = document.getElementById('recent-grid');
 const titleEl = document.getElementById('recent-title');
 const subEl = document.getElementById('recent-sub');
 
-
-/* The hero's formula block. Every row is read off the schema the listing form
-   actually writes, so the marketplace cannot advertise a field it does not
-   record. Counts come from the real taxonomies rather than being typed in. */
-function renderFormula() {
-	const el = document.getElementById('hero-formula');
-	if (!el) return;
-	const rows = [
-		['Volume', 'ml, as bottled'],
-		['Fill', '% remaining'],
-		['Condition', `${CONDITIONS.length} grades`],
-		['Batch code', 'where legible'],
-		['Family', `${SCENT_FAMILIES.length} families`],
-	];
-	el.innerHTML = rows
-		.map(
-			([term, value]) => `
-			<div class="formula-row">
-				<dt>${term}</dt>
-				<dd class="data">${value}</dd>
-			</div>`,
-		)
-		.join('');
-}
 
 /* The organ: the real 12-family taxonomy as a numbered index. A grid of
    rounded category cards is the reflex here; an index is how a shelf is
@@ -103,7 +79,6 @@ async function render() {
 	fillGauges(grid);
 }
 
-renderFormula();
 renderOrgan();
 if (grid) wireLikeButtons(grid);
 render();

@@ -557,7 +557,7 @@ textarea:focus-visible,
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
 	gap: clamp(var(--space-10), 5vw, var(--space-16));
-	align-items: stretch;
+	align-items: center;
 }
 .hero-copy { display: flex; flex-direction: column; align-items: flex-start; }
 
@@ -572,46 +572,8 @@ textarea:focus-visible,
 	margin: 0 0 var(--space-6);
 	text-wrap: initial; /* the line breaks are authored */
 }
-.hero-lede {
-	color: var(--on-shelf-2);
-	font-size: var(--text-base);
-	line-height: 1.55;
-	max-width: 40ch;
-	margin: 0 0 var(--space-8);
-}
 .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 
-/* The formula block. Hairline-ruled rows, term left, measured value right;
-   the same grammar the listing detail uses, introduced here. */
-.formula {
-	width: 100%;
-	max-width: 30rem;
-	/* Pushed to the bottom of the column so the two hero columns end together
-	   instead of leaving a wedge of empty shelf under the shorter one. */
-	margin: auto 0 0;
-	padding-top: var(--space-10);
-	border-top: 1px solid var(--rule-on-shelf);
-}
-.formula-row {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: var(--space-4);
-	padding: var(--space-3) 0;
-	border-bottom: 1px solid var(--rule-on-shelf);
-}
-.formula dt {
-	font-size: var(--text-sm);
-	color: var(--on-shelf);
-	font-weight: 500;
-}
-.formula dd {
-	margin: 0;
-	font-size: var(--text-micro);
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: var(--on-shelf-2);
-}
 
 /* ---------- Specimen: how Vial frames a bottle ----------
    Hard edges, a hairline, an amber fill gauge down the left, and a measured
@@ -1680,7 +1642,6 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: var(--spac
 	   squeezed beside it. */
 	.specimen-hero { order: -1; }
 	.specimen-hero .specimen-frame { min-height: 0; aspect-ratio: 16 / 10; max-height: 46vh; }
-	.formula { max-width: none; margin-top: var(--space-8); padding-top: var(--space-8); }
 	.hero-title { font-size: clamp(2.2rem, 7vw, 3.2rem); }
 
 	.browse-layout { grid-template-columns: 1fr; }
