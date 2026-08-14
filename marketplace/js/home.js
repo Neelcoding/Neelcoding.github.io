@@ -6,7 +6,6 @@ import { renderEmptyState } from './empty-state.js';
 
 const grid = document.getElementById('recent-grid');
 const titleEl = document.getElementById('recent-title');
-const subEl = document.getElementById('recent-sub');
 
 
 /* The organ: the real 12-family taxonomy as a numbered index. A grid of
@@ -50,12 +49,9 @@ async function render() {
 	const header = document.querySelector('.recent-section .section-head');
 	if (header) header.hidden = nothingListed;
 
+	// The heading alone now carries the distinction between your own history
+	// and the newest listings.
 	if (titleEl) titleEl.textContent = usingFallback ? 'Just landed' : 'Recently viewed';
-	if (subEl) {
-		subEl.textContent = usingFallback
-			? "Nothing in your history yet, so here's what's new."
-			: 'Picking up where you left off.';
-	}
 
 	if (nothingListed) {
 		/* A centred island in a tall void reads as "the query returned nothing".
