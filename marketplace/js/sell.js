@@ -20,7 +20,7 @@ function renderSignedOut() {
 function renderForm(user) {
 	root.innerHTML = `
 		<h1 style="margin-bottom:6px;">List a bottle</h1>
-		<p class="page-lede">Takes a couple of minutes. Answer honestly rather than generously: buyers here are choosing partly on how much is left, and an accurate listing is what gets offers instead of questions.</p>
+		<p class="page-lede">Takes a couple of minutes. Be exact about fill and condition. That is what buyers are deciding on.</p>
 		<div class="card-panel">
 			<div id="form-msg"></div>
 			<form id="sell-form">
