@@ -30,27 +30,25 @@ function declaredFill(gaugeEl) {
 }
 
 /**
- * Gauges fill from empty to their reading. This is the one signature moment:
- * the site's only chroma arriving as a measurement being taken.
+ * Listing gauges fill from empty to their reading. This is the one signature
+ * moment: the site's only chroma arriving as a measurement being taken, and it
+ * runs on real fill percentages rather than a staged number.
  */
 export function fillGauges(root = document) {
-	const gauges = [...root.querySelectorAll('.fill-gauge, .card-gauge')].filter((g) => !g.dataset.filled);
+	const gauges = [...root.querySelectorAll('.card-gauge')].filter((g) => !g.dataset.filled);
 	if (!gauges.length) return;
 	gauges.forEach((g) => (g.dataset.filled = '1'));
 
 	if (!gsapReady() || prefersReducedMotion()) return;
 
 	gauges.forEach((gauge) => {
-		const level = gauge.querySelector('.fill-gauge-level, span');
+		const level = gauge.querySelector('span');
 		if (!level) return;
-		const target = declaredFill(gauge);
-		const vertical = gauge.classList.contains('fill-gauge');
-		const prop = vertical ? 'height' : 'width';
 		gsap.fromTo(
 			level,
-			{ [prop]: '0%' },
+			{ width: '0%' },
 			{
-				[prop]: target,
+				width: declaredFill(gauge),
 				duration: 1.1,
 				ease: EASE,
 				scrollTrigger: window.ScrollTrigger
@@ -73,9 +71,8 @@ export function heroEntrance() {
 	}
 	const actions = document.querySelector('.hero-actions');
 	const specimen = document.querySelector('.specimen-hero .specimen-frame');
-	const caption = document.querySelector('.specimen-hero .specimen-caption');
 
-	const fading = [title, actions, caption].filter(Boolean);
+	const fading = [title, actions].filter(Boolean);
 	gsap.set(fading, { opacity: 0, y: 14 });
 	if (specimen) gsap.set(specimen, { opacity: 0, scale: 1.02 });
 	setTimeout(() => forceVisible([...fading, specimen].filter(Boolean)), 2200);
@@ -88,7 +85,6 @@ export function heroEntrance() {
 		tl.to(specimen, { opacity: 1, scale: 1, duration: 0.8 }, 0.08);
 	}
 	if (actions) tl.to(actions, { opacity: 1, y: 0, duration: 0.5 }, '-=0.55');
-	if (caption) tl.to(caption, { opacity: 1, y: 0, duration: 0.45 }, '-=0.4');
 
 	tl.add(() => fillGauges(), '-=0.5');
 }

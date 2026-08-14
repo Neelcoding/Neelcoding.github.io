@@ -576,14 +576,11 @@ textarea:focus-visible,
 
 
 /* ---------- Specimen: how Vial frames a bottle ----------
-   Hard edges, a hairline, an amber fill gauge down the left, and a measured
-   caption underneath. Used in the hero and on listing detail. */
+   Hard edges, no rounding, no tilt, no shadow. The photograph is the object;
+   measurement belongs to real listings, not to the hero's staging. */
 .specimen { margin: 0; display: flex; flex-direction: column; }
-.specimen-body { display: flex; gap: var(--space-3); flex: 1; min-height: 0; }
 .specimen-frame {
 	position: relative;
-	flex: 1;
-	min-width: 0;
 	overflow: hidden;
 	border-radius: var(--r-image);
 	background: var(--shelf-raised);
@@ -594,59 +591,9 @@ textarea:focus-visible,
 	object-fit: cover;
 	display: block;
 }
-.specimen-hero .specimen-frame { min-height: 440px; }
+.specimen-hero .specimen-frame { aspect-ratio: 4 / 3; }
 
-/* The gauge is the one place amber appears, and it always reports volume.
-   Ticks make it an instrument rather than a decorative stripe. */
-.fill-gauge {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: var(--space-2);
-	flex-shrink: 0;
-}
-.fill-gauge-read {
-	font-size: var(--text-micro);
-	letter-spacing: 0.08em;
-	color: var(--amber-bright);
-	line-height: 1;
-}
-.fill-gauge-track {
-	position: relative;
-	flex: 1;
-	width: 8px;
-	background: var(--amber-track);
-	/* Quarter ticks, drawn in the track itself. */
-	background-image: linear-gradient(to bottom, var(--rule-on-shelf) 1px, transparent 1px);
-	background-size: 100% 25%;
-	border-radius: 1px;
-}
-.fill-gauge-level {
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	height: var(--fill, 0%);
-	background: var(--amber);
-	border-radius: 1px;
-}
 
-.specimen-caption {
-	display: flex;
-	align-items: center;
-	gap: var(--space-3);
-	margin-top: var(--space-3);
-	font-family: var(--font-data);
-	font-size: var(--text-micro);
-	letter-spacing: 0.12em;
-	color: var(--on-shelf-2);
-}
-.specimen-sep {
-	width: 14px;
-	height: 1px;
-	background: var(--rule-on-shelf);
-	flex-shrink: 0;
-}
 
 /* ---------- Homepage sections ---------- */
 /* The heading rule draws along its length on arrival; a catalogue line being
@@ -969,8 +916,9 @@ select {
 .listing-card:hover .thumb img { transform: scale(1.025); }
 .thumb-icon svg { width: 34%; height: 34%; }
 
-/* Card gauge: same instrument as the hero, sized down and laid along the
-   bottom edge of the frame where it cannot be mistaken for a border. */
+/* The fill gauge. It reports a listing's real remaining volume and is the only
+   place amber appears, so chroma on this site always means liquid. Laid along
+   the frame's bottom edge, inset from it so it is not read as a border. */
 .card-gauge {
 	position: absolute;
 	left: 0;
