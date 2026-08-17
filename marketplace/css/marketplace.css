@@ -240,6 +240,13 @@ textarea:focus-visible,
 .site-header input:focus-visible,
 .hero a:focus-visible,
 .hero button:focus-visible { outline-color: var(--on-shelf); }
+/* Except the two light blocks sitting in that band: on paper the light ring
+   disappears, so those invert back to ink. */
+.header-search button:focus-visible,
+.site-header .btn-on-shelf:focus-visible {
+	outline-color: var(--ink);
+	outline-offset: -4px;
+}
 /* On dark or photographic backgrounds the accent-coloured ring disappears,
    so those get a light ring instead. */
 .hero-photo a:focus-visible,
@@ -299,20 +306,23 @@ textarea:focus-visible,
    brand borrows the system's only chroma. */
 .logo span { color: var(--amber-bright); }
 
-/* Search is the marketplace's spine, so it holds the centre, but at a
-   restrained height and radius rather than a full-width pill. */
+/* Search is the marketplace's spine, so it holds the centre. The submit sits
+   in a filled block at the end of the field: the same paper the header's own
+   button uses, so the two light blocks in the band match rather than
+   introducing a third tone. */
 .header-search {
 	flex: 1;
-	max-width: 460px;
+	max-width: 680px;
 	display: flex;
-	flex-direction: row-reverse;
-	align-items: center;
-	gap: var(--space-2);
+	align-items: stretch;
 	height: 38px;
-	padding: 0 var(--space-3);
+	/* Padding on the input side only; the submit block runs flush to the end. */
+	padding: 0 0 0 var(--space-3);
 	background: var(--shelf-raised);
 	border: 1px solid var(--rule-on-shelf);
 	border-radius: var(--r-md);
+	/* Clips the block's corners to the field's own radius. */
+	overflow: hidden;
 	transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 .header-search:focus-within {
@@ -322,7 +332,6 @@ textarea:focus-visible,
 .header-search input {
 	flex: 1;
 	min-width: 0;
-	align-self: stretch;
 	border: none;
 	background: transparent;
 	padding: 0;
@@ -331,22 +340,23 @@ textarea:focus-visible,
 	outline: none;
 }
 .header-search input::placeholder { color: var(--on-shelf-2); }
+
 .header-search button {
 	display: flex;
 	align-items: center;
-	border: none;
-	background: transparent;
-	color: var(--on-shelf-2);
-	padding: 0;
-	min-width: 24px;
-	align-self: stretch;
 	justify-content: center;
-	cursor: pointer;
+	width: 48px;
 	flex-shrink: 0;
-	transition: color var(--dur-fast) var(--ease);
+	border: none;
+	border-radius: 0;
+	background: var(--paper);
+	color: var(--ink);
+	padding: 0;
+	cursor: pointer;
+	transition: background var(--dur-fast) var(--ease);
 }
-.header-search button svg { width: 16px; height: 16px; }
-.header-search:focus-within button { color: var(--on-shelf); }
+.header-search button:hover { background: #fff; }
+.header-search button svg { width: 17px; height: 17px; }
 
 .header-actions {
 	display: flex;
@@ -546,20 +556,32 @@ textarea:focus-visible,
 .demo-banner strong { font-weight: 700; }
 
 /* ---------- Hero: the shelf ----------
-   Continuous with the header band. Asymmetric, image-forward, and built from
-   rules and columns rather than cards. */
+   The fragrance photograph spans the whole shelf. Its outpainted shadow on
+   the left gives the editorial copy a quiet, readable field. */
 .hero {
-	background: var(--shelf);
+	position: relative;
+	background-color: var(--shelf);
+	background-image:
+		linear-gradient(90deg, rgba(10, 11, 12, 0.38) 0%, rgba(10, 11, 12, 0.16) 43%, rgba(10, 11, 12, 0) 68%),
+		url('../images/hero-spray-wide.png');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
 	color: var(--on-shelf);
-	padding: var(--space-14) 0 var(--space-16);
+	min-height: clamp(560px, 62vw, 740px);
+	display: flex;
+	align-items: center;
+	padding: var(--space-16) 0;
 }
 .hero-grid {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-	gap: clamp(var(--space-10), 5vw, var(--space-16));
-	align-items: center;
+	width: 100%;
 }
-.hero-copy { display: flex; flex-direction: column; align-items: flex-start; }
+.hero-copy {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	max-width: 640px;
+}
 
 .hero-title {
 	font-family: var(--font-display);
@@ -1576,7 +1598,6 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: var(--spac
 
 /* Laptop */
 @media (max-width: 1180px) {
-	.hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr); }
 	.hero-title { font-size: clamp(2.4rem, 5vw, 3.6rem); }
 	.organ-index { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-10); }
 	.browse-layout { grid-template-columns: 200px 1fr; gap: var(--space-8); }
@@ -1584,12 +1605,15 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: var(--spac
 
 /* Tablet */
 @media (max-width: 900px) {
-	.hero { padding: var(--space-10) 0 var(--space-12); }
-	.hero-grid { grid-template-columns: 1fr; gap: var(--space-10); }
-	/* Image leads on narrow screens; the headline reads better under it than
-	   squeezed beside it. */
-	.specimen-hero { order: -1; }
-	.specimen-hero .specimen-frame { min-height: 0; aspect-ratio: 16 / 10; max-height: 46vh; }
+	.hero {
+		min-height: 590px;
+		padding: var(--space-12) 0;
+		background-position: 62% center;
+		background-image:
+			linear-gradient(90deg, rgba(10, 11, 12, 0.72) 0%, rgba(10, 11, 12, 0.5) 52%, rgba(10, 11, 12, 0.08) 100%),
+			url('../images/hero-spray-wide.png');
+	}
+	.hero-copy { max-width: 520px; }
 	.hero-title { font-size: clamp(2.2rem, 7vw, 3.2rem); }
 
 	.browse-layout { grid-template-columns: 1fr; }
@@ -1624,6 +1648,13 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: var(--spac
 	.label-full { display: none; }
 	.label-short { display: inline; }
 
+	.hero {
+		min-height: 540px;
+		background-position: 66% center;
+		background-image:
+			linear-gradient(90deg, rgba(10, 11, 12, 0.88) 0%, rgba(10, 11, 12, 0.66) 58%, rgba(10, 11, 12, 0.2) 100%),
+			url('../images/hero-spray-wide.png');
+	}
 	.hero-title { font-size: clamp(2rem, 9vw, 2.6rem); }
 	.hero-actions { width: 100%; }
 	.hero-actions .btn { flex: 1; }
