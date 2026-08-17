@@ -1,7 +1,7 @@
 // Data access layer. Every page talks to the app through these functions so
 // that swapping demo mode for a live Supabase project later doesn't require
 // touching page code, only this file.
-import { getSupabase, isSupabaseConfigured } from './supabase-client.js';
+import { getSupabase, isSupabaseConfigured, SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-client.js';
 import { MOCK_LISTINGS, MOCK_PROFILES } from './mock-data.js';
 
 const LOCAL_LISTINGS_KEY = 'fm_demo_listings';
@@ -216,7 +216,9 @@ export async function getListingById(id) {
 		const supabase = await getSupabase();
 		const { data, error } = await supabase
 			.from('listings')
-			.select('*, profiles(id, username, display_name, location, bio, avatar_url)')
+			// stripe_payouts_enabled rides along so the listing page can tell a
+			// buyer the seller can't be paid yet, instead of failing at checkout.
+			.select('*, profiles(id, username, display_name, location, bio, avatar_url, stripe_payouts_enabled)')
 			.eq('id', id)
 			.single();
 		if (error) return null;
@@ -571,6 +573,105 @@ export async function placeBid({ listingId, bidderId, amount }) {
 	list.push(bid);
 	writeLocal(LOCAL_BIDS_KEY, list);
 	return bid;
+}
+
+// ---------- Seller payouts ----------
+
+// Edge functions that act on behalf of a user need that user's own token, not
+// the publishable key, or they have no way to know who is calling.
+export async function getAccessToken() {
+	if (!isSupabaseConfigured) return null;
+	const supabase = await getSupabase();
+	const { data } = await supabase.auth.getSession();
+	return data?.session?.access_token || null;
+}
+const accessToken = getAccessToken;
+
+async function callFunction(name, body) {
+	const token = await accessToken();
+	if (!token) throw new Error('Please sign in again.');
+	const res = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+			apikey: SUPABASE_ANON_KEY,
+		},
+		body: JSON.stringify(body),
+	});
+	const data = await res.json().catch(() => ({}));
+	if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+	return data;
+}
+
+// Demo mode has no Stripe behind it, so rather than fake a connected account
+// these report honestly that payouts need the live project.
+export async function getPayoutStatus() {
+	if (!isSupabaseConfigured) return { demo: true, connected: false, payoutsEnabled: false, detailsSubmitted: false };
+	return { demo: false, ...(await callFunction('connect-onboard', { action: 'status' })) };
+}
+
+export async function startPayoutOnboarding() {
+	const { url } = await callFunction('connect-onboard', {
+		action: 'start',
+		origin: location.href.replace(/\/[^/]*$/, ''),
+	});
+	return url;
+}
+
+export async function getPayoutDashboardUrl() {
+	const { url } = await callFunction('connect-onboard', { action: 'dashboard' });
+	return url;
+}
+
+// ---------- Orders ----------
+
+const ORDER_SELECT = '*, listings(id, brand, name, images, price), buyer:buyer_id(id, username, display_name, avatar_url), seller:seller_id(id, username, display_name, avatar_url)';
+
+export async function getOrdersForBuyer(buyerId) {
+	if (!isSupabaseConfigured) return [];
+	const supabase = await getSupabase();
+	const { data, error } = await supabase
+		.from('orders')
+		.select(ORDER_SELECT)
+		.eq('buyer_id', buyerId)
+		.order('created_at', { ascending: false });
+	if (error) throw new Error(error.message);
+	return data || [];
+}
+
+export async function getOrdersForSeller(sellerId) {
+	if (!isSupabaseConfigured) return [];
+	const supabase = await getSupabase();
+	const { data, error } = await supabase
+		.from('orders')
+		.select(ORDER_SELECT)
+		.eq('seller_id', sellerId)
+		.order('created_at', { ascending: false });
+	if (error) throw new Error(error.message);
+	return data || [];
+}
+
+// The three mutations go through database functions rather than table updates,
+// so a seller can never edit the amounts on a sale, only its shipping state.
+async function callRpc(name, args) {
+	if (!isSupabaseConfigured) throw new Error('Orders need the live project.');
+	const supabase = await getSupabase();
+	const { data, error } = await supabase.rpc(name, args);
+	if (error) throw new Error(error.message);
+	return data;
+}
+
+export function markOrderShipped(orderId, carrier, tracking) {
+	return callRpc('mark_order_shipped', { order_id: orderId, carrier: carrier || '', tracking: tracking || '' });
+}
+
+export function markOrderDelivered(orderId) {
+	return callRpc('mark_order_delivered', { order_id: orderId });
+}
+
+export function requestOrderRefund(orderId, reason) {
+	return callRpc('request_order_refund', { order_id: orderId, reason: reason || '' });
 }
 
 export const SCENT_FAMILIES = [

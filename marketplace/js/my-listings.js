@@ -1,4 +1,4 @@
-import { getCurrentUser, getListingsBySeller, updateListingStatus, CONDITIONS } from './db.js';
+import { getCurrentUser, getListingsBySeller, updateListingStatus, getPayoutStatus, CONDITIONS } from './db.js';
 import { renderThumbImage } from './icons.js';
 import { revealOnScroll } from './motion.js';
 import { renderEmptyState, renderSignedOut as renderSignedOutState } from './empty-state.js';
@@ -37,6 +37,7 @@ async function render() {
 			</div>
 		</div>
 		<p style="color:var(--ink-soft);margin:0 0 24px;">Everything you've listed, in one place.</p>
+		<div id="payout-warning"></div>
 		${listings.length ? listings.map(listingRow).join('') : renderEmptyState({
 			icon: 'bottle',
 			title: 'No bottles up yet',
@@ -55,6 +56,29 @@ async function render() {
 		});
 	});
 	revealOnScroll('.offer-row', { y: 14 });
+	warnIfUnpaid(listings.length);
+}
+
+/* A listing that nobody can buy looks identical to one that nobody wants, and
+   the seller has no way to tell the difference. This is the page they come back
+   to, so it is where the unfinished payout setup has to surface. */
+async function warnIfUnpaid(listingCount) {
+	const el = document.getElementById('payout-warning');
+	if (!el || !listingCount) return;
+	let status;
+	try {
+		status = await getPayoutStatus();
+	} catch {
+		return; // Never block the listings themselves on a status check.
+	}
+	if (status.demo || status.payoutsEnabled) return;
+	el.innerHTML = `
+		<div class="form-msg error" style="margin-bottom:20px;">
+			<strong>Your bottles can't be bought yet.</strong>
+			Payout setup isn't finished, so the Buy button is hidden on your listings.
+			<a href="account.html">Finish it on your account page</a> and they go live immediately.
+		</div>
+	`;
 }
 
 function listingRow(listing) {

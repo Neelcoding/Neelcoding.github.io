@@ -1557,6 +1557,70 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: var(--spac
 .offer-status.pending { background: var(--cream-dark); color: var(--ink-soft); }
 .offer-status.accepted { background: #e9f5ec; color: var(--success); }
 .offer-status.declined { background: #fbe9e7; color: var(--danger); }
+.offer-status.paid { background: var(--cream-dark); color: var(--ink-soft); }
+.offer-status.shipped { background: var(--cream-dark); color: var(--ink); }
+.offer-status.refunded,
+.offer-status.refund_requested { background: #fbe9e7; color: var(--danger); }
+.offer-status.delivered { background: #e9f5ec; color: var(--success); }
+
+/* ---------- Payout + order state ----------
+   A dot rather than a coloured pill: these lines are sentences, and the state
+   is carried by the sentence. The dot is a marker beside it, never the message,
+   so the meaning survives for anyone who can't separate the two hues. */
+.payout-state {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	margin: 0 0 var(--space-2);
+	font-weight: 600;
+}
+.payout-dot {
+	width: 8px;
+	height: 8px;
+	flex-shrink: 0;
+	border-radius: 50%;
+	background: var(--ink-soft);
+}
+.payout-state.is-ready .payout-dot { background: var(--success); }
+.payout-state.is-pending .payout-dot { background: var(--rule-strong); }
+
+.order-address {
+	font-family: var(--font-data);
+	font-size: var(--text-sm);
+	line-height: 1.55;
+	color: var(--ink-2);
+	margin: var(--space-3) 0 0;
+	padding-top: var(--space-3);
+	border-top: 1px solid var(--rule);
+	white-space: pre-line;
+}
+.order-ship-form {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+	margin-top: var(--space-3);
+	padding-top: var(--space-3);
+	border-top: 1px solid var(--rule);
+}
+.order-ship-form input { flex: 1 1 160px; min-width: 0; }
+.order-tabs {
+	display: flex;
+	gap: var(--space-5);
+	margin-bottom: var(--space-6);
+	border-bottom: 1px solid var(--rule);
+}
+.order-tabs button {
+	appearance: none;
+	background: none;
+	border: none;
+	border-bottom: 2px solid transparent;
+	padding: 0 0 var(--space-3);
+	font-family: var(--font-ui);
+	font-size: var(--text-base);
+	color: var(--ink-2);
+	cursor: pointer;
+}
+.order-tabs button.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
 
 /* ---------- Auction ---------- */
 .auction-panel {

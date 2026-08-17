@@ -7,6 +7,9 @@ import {
 	signIn,
 	signUp,
 	signOut,
+	getPayoutStatus,
+	startPayoutOnboarding,
+	getPayoutDashboardUrl,
 } from './db.js';
 import { renderAvatar } from './icons.js';
 import { openAvatarCropper } from './avatar-cropper.js';
@@ -138,8 +141,15 @@ async function renderAccount() {
 			</form>
 		</div>
 
+		<div class="card-panel" id="payout-panel" style="margin-bottom:24px;">
+			<h2 style="margin-top:0;">Getting paid</h2>
+			<div id="payout-body"><p class="hint">Checking your payout account…</p></div>
+		</div>
+
 		<button class="btn btn-outline" id="signout-btn">Sign out</button>
 	`;
+
+	renderPayouts();
 
 	document.getElementById('profile-form').addEventListener('submit', async (e) => {
 		e.preventDefault();
@@ -184,6 +194,86 @@ async function renderAccount() {
 		}
 		pickBtn.disabled = false;
 		pickBtn.textContent = 'Change photo';
+	});
+}
+
+/* Payouts are the difference between a listing and a sale, so this states
+   plainly where someone stands rather than hiding it behind a settings link.
+   Stripe is asked for the live status on every render: the cached flags in the
+   database exist so other pages can read them cheaply, not to be trusted here,
+   where being wrong means telling someone they can be paid when they can't. */
+async function renderPayouts() {
+	const body = document.getElementById('payout-body');
+	if (!body) return;
+
+	let status;
+	try {
+		status = await getPayoutStatus();
+	} catch (err) {
+		body.innerHTML = `<p class="hint">Couldn't check your payout account: ${escapeHtml(err.message)}</p>
+			<button class="btn btn-outline btn-sm" id="payout-retry">Try again</button>`;
+		document.getElementById('payout-retry')?.addEventListener('click', renderPayouts);
+		return;
+	}
+
+	if (status.demo) {
+		body.innerHTML = `<p class="hint">Payouts run through Stripe, which needs the live project connected. In demo mode you can list and browse, but nothing can be bought or paid out.</p>`;
+		return;
+	}
+
+	if (status.payoutsEnabled) {
+		body.innerHTML = `
+			<p class="payout-state is-ready"><span class="payout-dot" aria-hidden="true"></span>Your payout account is active.</p>
+			<p class="hint">When a bottle sells, the price goes to your bank on Stripe's normal schedule and Vial keeps the 5% processing fee. You never handle the payment yourself.</p>
+			<button class="btn btn-outline btn-sm" id="payout-dashboard">View payouts on Stripe</button>
+		`;
+		document.getElementById('payout-dashboard')?.addEventListener('click', async (e) => {
+			const btn = e.currentTarget;
+			btn.disabled = true;
+			btn.textContent = 'Opening…';
+			try {
+				location.href = await getPayoutDashboardUrl();
+			} catch (err) {
+				btn.disabled = false;
+				btn.textContent = 'View payouts on Stripe';
+				showMsg(err.message, 'error');
+			}
+		});
+		return;
+	}
+
+	// Submitted but not enabled means Stripe is either verifying or waiting on
+	// a specific document. Saying "under review" to someone who actually needs
+	// to upload an ID would leave them waiting on nothing.
+	const waiting = status.detailsSubmitted && !(status.requirements || []).length;
+	body.innerHTML = `
+		<p class="payout-state ${waiting ? 'is-pending' : ''}"><span class="payout-dot" aria-hidden="true"></span>${
+			waiting
+				? 'Stripe is reviewing your details.'
+				: status.connected
+					? 'Your payout setup is unfinished.'
+					: 'You have no payout account yet.'
+		}</p>
+		<p class="hint">${
+			waiting
+				? 'This usually takes a few minutes. Until it clears your listings stay visible, but nobody can buy them.'
+				: 'Stripe collects your bank details, ID and tax information directly, so none of it passes through Vial. Until this is done your listings stay visible, but nobody can buy them.'
+		}</p>
+		<button class="btn btn-primary btn-sm" id="payout-start">${status.connected ? 'Finish payout setup' : 'Set up payouts'}</button>
+	`;
+
+	document.getElementById('payout-start')?.addEventListener('click', async (e) => {
+		const btn = e.currentTarget;
+		const label = btn.textContent;
+		btn.disabled = true;
+		btn.textContent = 'Opening Stripe…';
+		try {
+			location.href = await startPayoutOnboarding();
+		} catch (err) {
+			btn.disabled = false;
+			btn.textContent = label;
+			showMsg(err.message, 'error');
+		}
 	});
 }
 

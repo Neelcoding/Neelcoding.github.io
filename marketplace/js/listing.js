@@ -6,6 +6,7 @@ import {
 	createOffer,
 	getBids,
 	placeBid,
+	getAccessToken,
 	CONDITIONS,
 } from './db.js';
 import { iconHeart, ICON_BAG, renderThumbImage, renderAvatar } from './icons.js';
@@ -169,8 +170,8 @@ function wireActionRow(listing, seller, currentUser, isOwner, bids) {
 	const canTransact = listing.status !== 'sold' && !listing.is_auction;
 	actionRow.innerHTML = `
 		${canTransact ? `
-			${isSupabaseConfigured ? '<button class="btn btn-primary" id="btn-buy">Buy now</button>' : ''}
-			<button class="btn ${isSupabaseConfigured ? 'btn-outline' : 'btn-primary'}" id="btn-offer">Make an offer</button>
+			${isSupabaseConfigured && sellerCanBePaid(listing) ? '<button class="btn btn-primary" id="btn-buy">Buy now</button>' : ''}
+			<button class="btn ${isSupabaseConfigured && sellerCanBePaid(listing) ? 'btn-outline' : 'btn-primary'}" id="btn-offer">Make an offer</button>
 			<button class="btn btn-outline" id="btn-bag">${ICON_BAG} ${inBag ? 'Remove from bag' : 'Add to bag'}</button>
 		` : ''}
 		${listing.status !== 'sold' ? '<button class="btn btn-outline" id="btn-contact">Contact seller</button>' : ''}
@@ -286,11 +287,14 @@ async function startCheckout(listing, button) {
 	button.disabled = true;
 	button.textContent = 'Redirecting to checkout…';
 	try {
+		// Send the buyer's own token when we have one, so the order is recorded
+		// against their account rather than just an email off the card.
+		const token = (await getAccessToken()) || SUPABASE_ANON_KEY;
 		const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout-session`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+				Authorization: `Bearer ${token}`,
 				apikey: SUPABASE_ANON_KEY,
 			},
 			body: JSON.stringify({ listingId: listing.id, origin: location.href.replace(/\/listing\.html.*$/, '') }),
@@ -311,9 +315,19 @@ async function startCheckout(listing, button) {
 	}
 }
 
+/* A seller who hasn't finished Stripe onboarding has no account for the money
+   to land in. Checkout refuses these server-side either way; hiding the button
+   means a buyer meets that fact before entering a card, not after. */
+function sellerCanBePaid(listing) {
+	return !!listing.profiles?.stripe_payouts_enabled;
+}
+
 function buyNowFeeNote(listing) {
-	const canBuyNow = isSupabaseConfigured && !listing.is_auction && listing.status !== 'sold';
-	if (!canBuyNow) return '';
+	const live = isSupabaseConfigured && !listing.is_auction && listing.status !== 'sold';
+	if (!live) return '';
+	if (!sellerCanBePaid(listing)) {
+		return `<div class="hint" style="margin:-10px 0 20px;">This seller hasn't finished setting up payouts, so instant checkout is off. You can still make an offer or message them.</div>`;
+	}
 	const fee = Number(listing.price) * 0.05;
 	const total = Number(listing.price) + fee;
 	return `<div class="hint" style="margin:-10px 0 20px;">+ 5% processing fee ($${fee.toFixed(2)}) at checkout, $${total.toFixed(2)} total</div>`;

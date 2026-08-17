@@ -62,6 +62,12 @@ Confirmed and built:
 - Auctions: seven day maximum, bids must exceed the current high.
 - Stripe Checkout, with a 5% processing fee shown to the buyer as its own line
   item before checkout.
+- Seller payouts via Stripe Connect Express. Each sale is a destination charge:
+  the item price transfers to the seller's connected account and the 5% stays
+  with the platform as an application fee. Sellers with unfinished onboarding
+  have the Buy button hidden rather than a checkout that fails.
+- Orders: shipping address collected at checkout, seller marks shipped with
+  carrier and tracking, buyer confirms delivery or reports a problem.
 - Accounts with profile, avatar upload, and a seller's own listings view.
 - Liked items, bag, and recently viewed, all stored per browser in
   localStorage rather than against the account.
@@ -70,19 +76,25 @@ Technical constraints:
 
 - Static HTML, CSS and vanilla JS ES modules. No build step, no framework.
 - Supabase for Postgres, auth, storage and edge functions. Tables: profiles,
-  listings, offers, bids, conversations, messages.
-- Stripe Checkout via edge functions.
+  listings, offers, bids, conversations, messages, orders.
+- Stripe Checkout and Connect via edge functions. Going live needs dashboard
+  steps only the account owner can take; see `SETUP-PAYOUTS.md`.
 - Hosted on GitHub Pages at neelcoding.github.io/marketplace/.
 
 Open and explicitly undecided:
 
-- **No seller payout exists.** There is no Stripe Connect or equivalent, so
-  every charge, item price and fee alike, settles into the single connected
-  Stripe account. Nothing routes money to sellers. This has to be solved before
-  real strangers transact.
-- No dispute, refund, returns or moderation flow.
-- No shipping: no address collection, labels, tracking or delivery
-  confirmation. A completed checkout does not arrange a handover.
+- **Refunds are manual.** A buyer can flag an order as a problem, which tells
+  the seller and marks the record, but no money moves until someone issues the
+  refund by hand in the Stripe dashboard. There is no dispute adjudication and
+  no policy on who decides.
+- **No shipping labels or carrier integration.** The address is collected and a
+  tracking number can be typed in, but nothing is validated: a seller can mark
+  an order shipped without shipping it, and nothing confirms delivery except
+  the buyer saying so.
+- **Fragrance ships as a flammable liquid.** Checkout is restricted to US
+  addresses for that reason, and the seller is told it must go ground. Nothing
+  enforces either.
+- No moderation flow.
 - No authenticity verification. Batch code is captured but never checked
   against anything.
 - Liked, bag and recently viewed do not follow a user across devices.
@@ -108,8 +120,8 @@ Absences future work must not paper over:
   invented.
 - No users, transactions, reviews, ratings or testimonials exist.
 - No press, partnerships, brand relationships or endorsements exist.
-- No shipping, returns, authentication or buyer protection guarantee exists,
-  so no surface may promise one.
+- No returns policy, authentication or buyer protection guarantee exists, so no
+  surface may promise one. Shipping is recorded, not arranged or insured.
 
 ## Product Principles
 
@@ -122,7 +134,8 @@ Absences future work must not paper over:
 3. **Never invent proof.** No fabricated counts, reviews, or guarantees. With
    no inventory and no transaction history, empty states and honest feature
    descriptions carry the weight instead.
-4. **Do not imply protections that do not exist.** No payouts, shipping,
-   refunds or authentication are built. Copy must not suggest otherwise.
+4. **Do not imply protections that do not exist.** Payouts and a shipping
+   record are built; automatic refunds, dispute resolution, insured delivery
+   and authentication are not. Copy must not suggest otherwise.
 5. **Buying is considered, not impulsive.** Comparison, questions and
    negotiation are the real path to purchase, not a one tap checkout.

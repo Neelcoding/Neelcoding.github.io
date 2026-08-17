@@ -71,6 +71,7 @@ async function renderHeaderActions() {
 					<a href="profile.html?id=${encodeURIComponent(user.id)}">View public profile</a>
 					<a href="account.html">Account settings</a>
 					<a href="my-listings.html">My listings</a>
+					<a href="orders.html">Orders</a>
 					<a href="offers.html">Offers received</a>
 					<a href="messages.html">Messages</a>
 					<div class="account-dropdown-divider"></div>
