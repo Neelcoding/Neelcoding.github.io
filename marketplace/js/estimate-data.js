@@ -202,7 +202,17 @@ export function estimate(config) {
 		anchorLabel = 'Comp median';
 		value = anchor * regime.opened * (0.55 + 0.45 * fill01) * cond.factor * comp.factor;
 	} else {
-		anchor = item.street[size];
+		anchor = streetFor(item, size);
+		// A fragrance with no street price in either source cannot be anchored,
+		// and guessing one would be worse than declining.
+		if (!anchor) {
+			return {
+				value: 0, low: 0, high: 0, confidence: 'Low', compCount: compsFor(item.id, size).length,
+				regime, anchor: 0, anchorLabel: 'Street price', floorBinds: false, splitFloor: 0,
+				streetValue: 0, ownedYears: Math.max(0, THIS_YEAR - purchaseYear), factors: [],
+				refused: true,
+			};
+		}
 		anchorLabel = 'Street price';
 		value = anchor * regime.opened * fill01 * cond.factor * comp.factor * fAge * fStorage;
 		// Six multipliers stack fast. Below 0.45x street the split floor should
@@ -337,8 +347,40 @@ const COMPS = {
 	],
 };
 
+/* ---------- Live overlay ----------
+   Populated by estimate-source.js when Supabase has real observations for a
+   fragrance. Registered per fragrance rather than globally, so coverage can
+   arrive unevenly without the page needing a cutover. */
+
+const LIVE = new Map();
+
+export function setLive(slug, payload) {
+	LIVE.set(slug, payload);
+}
+
+export function isLive(slug) {
+	return LIVE.has(slug);
+}
+
+/** Real observations when they exist for this fragrance, mock otherwise. */
 export function compsFor(itemId, size) {
-	return (COMPS[itemId] || []).filter((c) => c.size === size);
+	const live = LIVE.get(itemId);
+	const rows = live ? live.comps : COMPS[itemId] || [];
+	return rows.filter((c) => c.size === size);
+}
+
+/** Street price, preferring a live median over the bundled figure. */
+export function streetFor(item, size) {
+	const live = LIVE.get(item.id);
+	if (live && live.street[size] != null) return live.street[size];
+	return item.street?.[size] ?? null;
+}
+
+/** How much of what is on screen is real. Drives the provenance line. */
+export function provenance(slug) {
+	const live = LIVE.get(slug);
+	if (!live) return { live: false, comps: 0, sold: 0 };
+	return { live: true, comps: live.comps.length, sold: live.soldCount || 0 };
 }
 
 /* ---------- Market trend ----------

@@ -11,8 +11,12 @@
 
 import {
 	CATALOGUE, CONDITIONS, COMPLETENESS, REGIMES, THIS_YEAR,
-	estimate, compsFor, trendFor,
+	estimate, compsFor, trendFor, provenance,
 } from './estimate-data.js';
+import { hydrate, loadCatalogue, logValuation } from './estimate-source.js';
+
+// Swapped for the Supabase catalogue at boot when one is available.
+let catalogue = CATALOGUE;
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
@@ -120,8 +124,8 @@ function initCombo() {
 	function search(q) {
 		const s = q.trim().toLowerCase();
 		matches = s
-			? CATALOGUE.filter((c) => `${c.name} ${c.house} ${c.family}`.toLowerCase().includes(s))
-			: CATALOGUE.slice(0, 6);
+			? catalogue.filter((c) => `${c.name} ${c.house} ${c.family}`.toLowerCase().includes(s))
+			: catalogue.slice(0, 6);
 		active = matches.length ? 0 : -1;
 		paint();
 		list.classList.add('open');
@@ -169,7 +173,7 @@ function initCombo() {
 	});
 
 	function select(id) {
-		const item = CATALOGUE.find((c) => c.id === id);
+		const item = catalogue.find((c) => c.id === id);
 		if (!item) return;
 		input.value = '';
 		close();
@@ -201,6 +205,16 @@ function selectItem(item) {
 	btn.querySelector('.label').textContent = 'Estimate price';
 	$('#est-status').textContent = 'Ready to run';
 	btn.focus({ preventScroll: true });
+
+	// Real observations are fetched in the background. The form is already
+	// usable off the bundled set, so this never blocks; if live data arrives
+	// the panel quietly re-renders with it.
+	hydrate(item.id).then((got) => {
+		if (got && state.item?.id === item.id) {
+			renderProvenance();
+			renderResult();
+		}
+	});
 }
 
 function clearItem() {
@@ -566,6 +580,7 @@ async function runEstimate() {
 
 	result = estimate(state);
 	phase = 'done';
+	if (!result.refused) logValuation(state.item.id, { ...state, item: state.item.id }, result);
 
 	btn.classList.remove('is-working');
 	btn.disabled = false;
@@ -670,6 +685,20 @@ function renderResult() {
 	sticky.setAttribute('aria-hidden', 'false');
 	sticky.querySelector('.v').textContent = money(result.value);
 	sticky.querySelector('.r').innerHTML = `${money(result.low)} &ndash; ${money(result.high)}<br>${result.confidence} confidence`;
+}
+
+/** The masthead must not claim mock data is real, or real data is mock. */
+function renderProvenance() {
+	const el = $('#est-provenance-data');
+	if (!el) return;
+	const p = state.item ? provenance(state.item.id) : { live: false };
+	if (!p.live) {
+		el.innerHTML = 'Mock data';
+		return;
+	}
+	el.innerHTML = p.sold
+		? `Live data &middot; <b>${p.comps}</b> observations`
+		: `Live asking prices &middot; <b>${p.comps}</b> listings`;
 }
 
 function confLevel(c) {
@@ -910,6 +939,7 @@ function animateFactors() {
 function init() {
 	initCombo();
 	initAction();
+	renderProvenance();
 	renderIdentity();
 	renderConfig();
 	renderResult();
@@ -919,9 +949,15 @@ function init() {
 	// Demo affordance: deep-link a bottle so every state is reachable directly.
 	const preset = new URLSearchParams(location.search).get('item');
 	if (preset) {
-		const item = CATALOGUE.find((c) => c.id === preset);
+		const item = catalogue.find((c) => c.id === preset);
 		if (item) selectItem(item);
 	}
+
+	// Catalogue comes from Supabase when it has one, so fragrances can be added
+	// without a redeploy.
+	loadCatalogue().then((list) => {
+		if (list?.length) catalogue = list;
+	});
 }
 
 init();
