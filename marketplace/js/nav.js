@@ -17,6 +17,9 @@ const CATEGORIES = [
 	{ label: 'Unisex', href: 'browse.html?gender=unisex' },
 	{ label: 'Auctions', href: 'browse.html?auction=1' },
 	{ label: 'Under $50', href: 'browse.html?max=50' },
+	// Not a filter like the rest: the estimator is a destination, and this row
+	// is the only persistent surface wide enough to carry it on mobile.
+	{ label: "What's it worth?", href: 'estimate.html' },
 ];
 
 function renderCategoryNav() {

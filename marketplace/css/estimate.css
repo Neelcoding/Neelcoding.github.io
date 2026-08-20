@@ -1,0 +1,1412 @@
+/* ---------- Assay: the estimator ----------
+   Extends the Perfumer's Organ system in marketplace.css. No new tokens for
+   colour or type: the palette, the three faces, the hairline grammar and the
+   single easing all come from there. Two rules from that system shape this
+   screen in particular:
+
+   1. Amber means liquid volume and nothing else. The fill gauge is the only
+      chroma on the page. The price, the button and the confidence indicator
+      are all achromatic, which is why the fill control reads as the one
+      physical measurement among a set of judgements.
+   2. Structure is carried by hairlines and ground changes, not by cards and
+      shadow. The estimator is one continuous surface split by a rule, not two
+      floating panels.
+
+   The single deliberate escalation is the readout block, which drops to the
+   graphite shelf. Boldness is spent there and nowhere else. */
+
+.estimator {
+	--est-measure: 1240px;
+	--est-rule: var(--rule);
+	--est-pad: clamp(20px, 3.2vw, 40px);
+}
+
+.est-shell {
+	max-width: var(--est-measure);
+	margin: 0 auto;
+	padding: 0 var(--gutter);
+}
+
+/* ---------- Masthead ----------
+   Deliberately not a marketing hero: one line of identity, one line of scope,
+   and the provenance note that keeps the numbers honest. */
+
+.est-masthead {
+	padding: clamp(28px, 4.5vw, 52px) 0 clamp(20px, 2.6vw, 28px);
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: var(--space-8);
+	flex-wrap: wrap;
+}
+
+.est-masthead h1 {
+	font-family: var(--font-display);
+	font-variation-settings: 'opsz' 30;
+	font-weight: 700;
+	font-size: clamp(2rem, 4vw, 2.9rem);
+	letter-spacing: -0.025em;
+	line-height: 1.02;
+	margin: 0 0 var(--space-3);
+	text-wrap: balance;
+}
+
+.est-masthead .lede {
+	font-size: var(--text-sm);
+	color: var(--ink-2);
+	max-width: 44ch;
+	margin: 0;
+	line-height: 1.6;
+}
+
+.est-provenance {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+	text-align: right;
+	line-height: 1.7;
+	padding-bottom: 3px;
+}
+.est-provenance b {
+	color: var(--ink);
+	font-weight: 500;
+}
+
+/* ---------- Workspace ----------
+   Asymmetric by intent: configuration is a sequence of decisions and wants a
+   narrow measure; the valuation is a display object and wants room. The two
+   regions meet on a hairline rather than sitting apart as cards. */
+
+.est-workspace {
+	display: grid;
+	grid-template-columns: minmax(0, 41fr) minmax(0, 59fr);
+	border-top: 1px solid var(--ink);
+	border-bottom: 1px solid var(--est-rule);
+}
+
+.est-config {
+	padding: var(--est-pad) var(--est-pad) clamp(28px, 4vw, 44px) 0;
+	border-right: 1px solid var(--est-rule);
+	min-width: 0;
+}
+
+.est-result {
+	background: var(--surface);
+	padding: var(--est-pad);
+	min-width: 0;
+	/* The surface runs to the viewport edge on the right so the panel reads as
+	   a region of the page rather than a card sitting on it. One spread wide
+	   enough to clear any viewport, rather than a stack of fixed offsets that
+	   stop short on a large screen. */
+	box-shadow: 100vw 0 0 var(--surface);
+}
+
+@media (min-width: 1000px) {
+	.est-result-inner { position: sticky; top: 92px; }
+}
+
+/* ---------- Section labels ----------
+   Numbered because configuration genuinely is a sequence: you cannot grade a
+   bottle you have not chosen. */
+
+.est-step {
+	display: flex;
+	align-items: baseline;
+	gap: var(--space-3);
+	margin-bottom: var(--space-4);
+}
+.est-step .n {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	color: var(--ink-3);
+	font-weight: 500;
+}
+.est-step h2 {
+	font-family: var(--font-ui);
+	font-size: var(--text-sm);
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	margin: 0;
+	color: var(--ink);
+}
+.est-step .rule {
+	flex: 1;
+	height: 1px;
+	background: var(--est-rule);
+	align-self: center;
+}
+
+.est-section + .est-section { margin-top: clamp(26px, 3.4vw, 38px); }
+
+/* ---------- Search combobox ---------- */
+
+.combo { position: relative; }
+
+.combo-field {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	border: 1px solid var(--rule-strong);
+	border-radius: var(--r-sm);
+	background: var(--surface);
+	padding: 0 var(--space-4);
+	height: 52px;
+	transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.combo-field:hover { border-color: var(--ink-3); }
+.combo-field:focus-within {
+	border-color: var(--ink);
+	background: #fff;
+}
+.combo-field svg { color: var(--ink-3); flex-shrink: 0; }
+.combo-field:focus-within svg { color: var(--ink); }
+.combo-field:focus-within .combo-hint { opacity: 1; }
+
+.combo-field input {
+	flex: 1;
+	min-width: 0;
+	border: 0;
+	background: transparent;
+	font-family: var(--font-ui);
+	font-size: var(--text-base);
+	color: var(--ink);
+	padding: 0;
+	height: 100%;
+}
+.combo-field input:focus { outline: none; }
+.combo-field input::placeholder { color: var(--ink-3); }
+
+.combo-hint {
+	opacity: 0;
+	transition: opacity var(--dur-fast) var(--ease);
+	font-family: var(--font-data);
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	color: var(--ink-3);
+	border: 1px solid var(--rule);
+	border-radius: 2px;
+	padding: 2px 5px;
+	flex-shrink: 0;
+}
+@media (hover: none) { .combo-hint { display: none; } }
+
+.combo-list {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	right: 0;
+	z-index: 30;
+	background: #fff;
+	border: 1px solid var(--ink);
+	border-radius: var(--r-sm);
+	max-height: 320px;
+	overflow-y: auto;
+	padding: 4px;
+	margin: 0;
+	list-style: none;
+	opacity: 0;
+	transform: translateY(-4px);
+	pointer-events: none;
+	transition: opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.combo-list.open {
+	opacity: 1;
+	transform: none;
+	pointer-events: auto;
+}
+
+.combo-opt {
+	display: flex;
+	align-items: baseline;
+	gap: var(--space-3);
+	padding: 9px var(--space-3);
+	border-radius: 2px;
+	cursor: pointer;
+	line-height: 1.35;
+}
+.combo-opt strong {
+	font-weight: 500;
+	font-size: var(--text-sm);
+	color: var(--ink);
+}
+.combo-opt .house {
+	font-size: var(--text-micro);
+	color: var(--ink-2);
+	margin-left: auto;
+	white-space: nowrap;
+	padding-left: var(--space-3);
+}
+.combo-opt[aria-selected='true'] { background: var(--paper); }
+.combo-opt[aria-selected='true'] .house { color: var(--ink); }
+.combo-opt mark {
+	background: none;
+	color: inherit;
+	font-weight: 700;
+	box-shadow: inset 0 -2px 0 var(--rule-strong);
+}
+
+.combo-empty {
+	padding: var(--space-4);
+	font-size: var(--text-sm);
+	color: var(--ink-2);
+}
+
+/* ---------- Item identity ---------- */
+
+.identity {
+	display: grid;
+	grid-template-columns: 62px minmax(0, 1fr);
+	gap: var(--space-4);
+	align-items: center;
+	margin-top: var(--space-4);
+	padding: var(--space-4);
+	background: var(--surface);
+	border: 1px solid var(--est-rule);
+	border-left: 2px solid var(--ink);
+	border-radius: var(--r-sm);
+}
+.identity-thumb {
+	width: 62px;
+	height: 76px;
+	background: var(--paper);
+	border: 1px solid var(--est-rule);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--ink-3);
+}
+.identity-thumb svg { width: 30px; height: 30px; }
+.identity-name {
+	font-family: var(--font-display);
+	font-variation-settings: 'opsz' 20;
+	font-size: var(--text-lg);
+	font-weight: 600;
+	letter-spacing: -0.015em;
+	line-height: 1.15;
+	margin: 0 0 3px;
+}
+.identity-meta {
+	font-size: var(--text-sm);
+	color: var(--ink-2);
+	margin: 0 0 var(--space-2);
+}
+.identity-tags {
+	display: flex;
+	gap: var(--space-2);
+	flex-wrap: wrap;
+	font-family: var(--font-data);
+	font-size: 10px;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+}
+.identity-tags span {
+	border: 1px solid var(--rule);
+	border-radius: 2px;
+	padding: 2px 6px;
+}
+.identity-tags .regime {
+	border-color: var(--rule-strong);
+	color: var(--ink);
+}
+
+.identity-clear {
+	background: none;
+	border: 0;
+	padding: 4px;
+	cursor: pointer;
+	color: var(--ink-3);
+	align-self: flex-start;
+	line-height: 0;
+	transition: color var(--dur-fast) var(--ease);
+}
+.identity-clear:hover { color: var(--ink); }
+
+/* ---------- Attribute blocks ---------- */
+
+.attr + .attr { margin-top: var(--space-6); }
+/* Positioning context for the info popover. */
+.attr { position: relative; }
+
+.label-info {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2);
+}
+
+/* A disclosure, not an ornament: it only appears where a term needs defining. */
+.info-btn {
+	width: 15px;
+	height: 15px;
+	flex-shrink: 0;
+	border: 1px solid var(--rule-strong);
+	border-radius: 50%;
+	background: transparent;
+	color: var(--ink-3);
+	font-family: var(--font-data);
+	font-size: 9px;
+	font-weight: 500;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	padding: 0;
+	transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
+		background var(--dur-fast) var(--ease);
+}
+.info-btn:hover { border-color: var(--ink); color: var(--ink); }
+.info-btn[aria-expanded='true'] {
+	background: var(--ink);
+	border-color: var(--ink);
+	color: var(--paper);
+}
+
+.info-pop {
+	position: absolute;
+	z-index: 40;
+	top: 26px;
+	left: 0;
+	width: min(320px, 100%);
+	background: #fff;
+	border: 1px solid var(--ink);
+	border-radius: var(--r-sm);
+	padding: var(--space-4);
+	animation: info-in var(--dur-fast) var(--ease) both;
+}
+@keyframes info-in {
+	from { opacity: 0; transform: translateY(-3px); }
+	to { opacity: 1; transform: none; }
+}
+.info-pop p {
+	font-size: var(--text-sm);
+	line-height: 1.55;
+	color: var(--ink-2);
+	margin: 0 0 var(--space-3);
+}
+.info-pop p:last-child { margin-bottom: 0; }
+.info-pop .info-t {
+	font-family: var(--font-ui);
+	font-size: var(--text-sm);
+	font-weight: 600;
+	color: var(--ink);
+}
+.info-pop .info-f {
+	padding-top: var(--space-3);
+	border-top: 1px solid var(--rule);
+	color: var(--ink-3);
+	font-size: var(--text-micro);
+}
+
+.only-size {
+	font-size: var(--text-micro);
+	color: var(--ink-3);
+	margin: 0;
+	line-height: 1.5;
+}
+
+.attr-head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-4);
+	margin-bottom: var(--space-3);
+}
+.attr-head label,
+.attr-head .lbl {
+	font-family: var(--font-ui);
+	font-size: var(--text-micro);
+	font-weight: 600;
+	letter-spacing: 0.11em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+}
+.attr-value {
+	font-family: var(--font-data);
+	font-size: var(--text-sm);
+	font-variant-numeric: tabular-nums;
+	color: var(--ink);
+}
+.attr-note {
+	font-size: var(--text-micro);
+	color: var(--ink-3);
+	margin-top: var(--space-2);
+	line-height: 1.5;
+}
+
+/* ---------- Segmented control ----------
+   For closed sets of equal-weight options where the label alone decides. */
+
+.seg {
+	display: flex;
+	border: 1px solid var(--rule-strong);
+	border-radius: var(--r-sm);
+	overflow: hidden;
+	background: var(--surface);
+}
+.seg button {
+	flex: 1;
+	min-width: 0;
+	border: 0;
+	background: transparent;
+	padding: 10px var(--space-2);
+	font-family: var(--font-ui);
+	font-size: var(--text-sm);
+	font-weight: 500;
+	color: var(--ink-2);
+	cursor: pointer;
+	position: relative;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button:hover { background: var(--paper); color: var(--ink); }
+.seg button[aria-checked='true'] {
+	background: var(--ink);
+	color: var(--paper);
+	font-weight: 600;
+}
+.seg button[aria-checked='true']:hover { background: #000; }
+.seg .unit {
+	font-family: var(--font-data);
+	font-size: 10px;
+	opacity: 0.6;
+	margin-left: 2px;
+}
+
+/* ---------- Selection tiles ----------
+   For options carrying a description, where the choice is a judgement rather
+   than a lookup. Two lines of copy earn the extra area. */
+
+.tiles {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1px;
+	background: var(--rule);
+	border: 1px solid var(--rule-strong);
+	border-radius: var(--r-sm);
+	overflow: hidden;
+}
+.tile {
+	background: var(--surface);
+	border: 0;
+	text-align: left;
+	padding: var(--space-3) var(--space-4);
+	cursor: pointer;
+	display: block;
+	position: relative;
+	transition: background var(--dur-fast) var(--ease);
+	/* Reserve the tick's room in both states so selecting never reflows. */
+	padding-right: 30px;
+}
+.tile:hover { background: var(--paper); }
+.tile .t {
+	display: block;
+	font-family: var(--font-ui);
+	font-size: var(--text-sm);
+	font-weight: 600;
+	color: var(--ink-2);
+	line-height: 1.3;
+	transition: color var(--dur-fast) var(--ease);
+}
+.tile .d {
+	display: block;
+	font-size: var(--text-micro);
+	color: var(--ink-3);
+	line-height: 1.45;
+	margin-top: 2px;
+}
+.tile:hover .t { color: var(--ink); }
+.tile[aria-checked='true'] { background: var(--paper); }
+.tile[aria-checked='true'] .t { color: var(--ink); }
+.tile[aria-checked='true']::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: 2px;
+	background: var(--ink);
+}
+.tile .tick {
+	position: absolute;
+	top: 14px;
+	right: 12px;
+	width: 13px;
+	height: 13px;
+	color: var(--ink);
+	opacity: 0;
+	transform: scale(0.8);
+	transition: opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.tile[aria-checked='true'] .tick { opacity: 1; transform: none; }
+
+/* ---------- Fill gauge ----------
+   The one physical measurement in the form, and the one place amber appears.
+   Built on a real range input so keyboard and touch behaviour come for free. */
+
+.gauge { padding-top: var(--space-1); }
+
+.gauge-readout {
+	display: flex;
+	align-items: baseline;
+	gap: var(--space-2);
+	font-family: var(--font-data);
+	font-variant-numeric: tabular-nums;
+}
+.gauge-readout .pct {
+	font-size: 26px;
+	font-weight: 500;
+	color: var(--ink);
+	letter-spacing: -0.02em;
+}
+.gauge-readout .ml {
+	font-size: var(--text-sm);
+	color: var(--ink-3);
+}
+
+.gauge-track {
+	position: relative;
+	height: 34px;
+	margin-top: var(--space-3);
+	background: var(--amber-track);
+	border: 1px solid var(--rule-strong);
+	border-radius: 2px;
+	overflow: hidden;
+}
+.gauge-fill {
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: var(--fill, 0%);
+	background: var(--amber);
+	transition: width var(--dur) var(--ease);
+}
+/* Graduations read as a measuring vessel rather than a progress bar. */
+.gauge-ticks {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	pointer-events: none;
+}
+.gauge-ticks i {
+	flex: 1;
+	border-right: 1px solid rgba(22, 24, 26, 0.16);
+}
+.gauge-ticks i:last-child { border-right: 0; }
+
+.gauge input[type='range'] {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	opacity: 0;
+	cursor: ew-resize;
+	-webkit-appearance: none;
+	appearance: none;
+	background: transparent;
+}
+.gauge-track:has(input:focus-visible),
+.gauge-track.is-focus {
+	outline: 2px solid var(--ink);
+	outline-offset: 2px;
+}
+.gauge-edge {
+	position: absolute;
+	top: -1px;
+	bottom: -1px;
+	left: var(--fill, 0%);
+	width: 2px;
+	background: var(--ink);
+	transform: translateX(-1px);
+	transition: left var(--dur) var(--ease);
+	pointer-events: none;
+}
+.gauge-scale {
+	display: flex;
+	justify-content: space-between;
+	margin-top: var(--space-2);
+	font-family: var(--font-data);
+	font-size: 10px;
+	color: var(--ink-3);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Year rail ----------
+   Same primitive as the gauge, deliberately opposite treatment: no fill, no
+   chroma, a marker riding a graduated rule. Batch year is a point on a
+   timeline, not a quantity. */
+
+.rail { padding-top: var(--space-2); }
+.rail-track {
+	position: relative;
+	height: 30px;
+	margin-top: var(--space-2);
+}
+.rail-line {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 13px;
+	height: 1px;
+	background: var(--rule-strong);
+}
+.rail-ticks {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	justify-content: space-between;
+	pointer-events: none;
+}
+.rail-ticks i {
+	width: 1px;
+	height: 7px;
+	background: var(--rule-strong);
+	margin-top: 10px;
+}
+.rail-ticks i.major { height: 13px; margin-top: 7px; background: var(--ink-3); }
+.rail-marker {
+	position: absolute;
+	top: 4px;
+	left: var(--pos, 0%);
+	width: 3px;
+	height: 19px;
+	background: var(--ink);
+	transform: translateX(-1px);
+	transition: left var(--dur) var(--ease);
+	pointer-events: none;
+}
+.rail input[type='range'] {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	opacity: 0;
+	cursor: ew-resize;
+	-webkit-appearance: none;
+	appearance: none;
+	background: transparent;
+}
+.rail-track:has(input:focus-visible),
+.rail-track.is-focus {
+	outline: 2px solid var(--ink);
+	outline-offset: 3px;
+	border-radius: 2px;
+}
+.rail-scale {
+	display: flex;
+	justify-content: space-between;
+	font-family: var(--font-data);
+	font-size: 10px;
+	color: var(--ink-3);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Stepper ----------
+   Purchase year is a recalled fact, so it gets nudge controls rather than a
+   scale to aim at. */
+
+.stepper {
+	display: inline-flex;
+	align-items: stretch;
+	border: 1px solid var(--rule-strong);
+	border-radius: var(--r-sm);
+	background: var(--surface);
+	overflow: hidden;
+}
+.stepper button {
+	width: 40px;
+	border: 0;
+	background: transparent;
+	color: var(--ink-2);
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.stepper button:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+.stepper button:disabled { opacity: 0.32; cursor: not-allowed; }
+.stepper .val {
+	min-width: 74px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: var(--font-data);
+	font-size: var(--text-base);
+	font-variant-numeric: tabular-nums;
+	color: var(--ink);
+	border-left: 1px solid var(--rule);
+	border-right: 1px solid var(--rule);
+	padding: 9px 0;
+}
+.derived {
+	display: inline-flex;
+	align-items: baseline;
+	gap: var(--space-2);
+	margin-left: var(--space-4);
+	font-size: var(--text-micro);
+	color: var(--ink-3);
+}
+.derived b {
+	font-family: var(--font-data);
+	font-weight: 500;
+	color: var(--ink-2);
+}
+
+/* ---------- Estimate action ---------- */
+
+.est-action {
+	margin-top: clamp(26px, 3.4vw, 36px);
+	padding-top: var(--space-5);
+	border-top: 1px solid var(--ink);
+}
+
+.est-btn {
+	position: relative;
+	width: 100%;
+	min-height: 52px;
+	border: 1px solid var(--ink);
+	border-radius: var(--r-sm);
+	background: var(--ink);
+	color: var(--paper);
+	font-family: var(--font-ui);
+	font-size: var(--text-base);
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	cursor: pointer;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-3);
+	transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease),
+		opacity var(--dur-fast) var(--ease);
+}
+.est-btn:hover:not(:disabled) { background: #000; }
+.est-btn:active:not(:disabled) { transform: scale(0.985); }
+.est-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.est-btn .label { position: relative; z-index: 2; }
+.est-btn .arrow {
+	position: relative;
+	z-index: 2;
+	transition: transform var(--dur) var(--ease);
+}
+.est-btn:hover:not(:disabled) .arrow { transform: translateX(3px); }
+
+/* The progress line rides inside the button rather than appearing beside it,
+   so the control becomes the loading state instead of being replaced by one. */
+.est-btn .progress {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 2px;
+	width: 0;
+	background: var(--amber-bright);
+	z-index: 3;
+}
+.est-btn.is-working { background: var(--shelf-raised); cursor: progress; }
+.est-btn.is-working .arrow { opacity: 0; }
+
+.est-status {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+	margin-top: var(--space-3);
+	min-height: 15px;
+	text-align: center;
+}
+
+/* ---------- Result: shared ---------- */
+
+.est-result-inner { display: block; }
+
+.result-head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-4);
+	margin-bottom: var(--space-4);
+	padding-bottom: var(--space-3);
+	border-bottom: 1px solid var(--rule-strong);
+}
+.result-head h2 {
+	font-family: var(--font-ui);
+	font-size: var(--text-micro);
+	font-weight: 600;
+	letter-spacing: 0.11em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+	margin: 0;
+}
+.result-head .meta {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	color: var(--ink-3);
+	letter-spacing: 0.06em;
+}
+
+/* ---------- Readout: the one graphite block ---------- */
+
+.readout {
+	background: var(--shelf);
+	color: var(--on-shelf);
+	border-radius: var(--r-sm);
+	padding: clamp(22px, 3vw, 32px);
+	position: relative;
+	overflow: hidden;
+	transition: opacity var(--dur) var(--ease);
+}
+
+.readout-label {
+	font-family: var(--font-data);
+	font-size: 10px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--on-shelf-2);
+	margin-bottom: var(--space-3);
+}
+
+.readout-value {
+	display: flex;
+	align-items: baseline;
+	gap: 2px;
+	font-family: var(--font-display);
+	font-variation-settings: 'opsz' 30;
+	font-weight: 600;
+	font-size: clamp(3rem, 7.4vw, 4.75rem);
+	line-height: 0.94;
+	letter-spacing: -0.035em;
+	font-variant-numeric: tabular-nums;
+	color: var(--on-shelf);
+}
+.readout-value .cur {
+	font-size: 0.3em;
+	font-weight: 500;
+	letter-spacing: 0;
+	color: var(--on-shelf-2);
+	align-self: flex-start;
+	margin-top: 0.24em;
+	margin-right: 0.06em;
+}
+
+.readout-sub {
+	display: flex;
+	align-items: baseline;
+	gap: var(--space-3);
+	margin-top: var(--space-3);
+	font-size: var(--text-sm);
+	color: var(--on-shelf-2);
+	flex-wrap: wrap;
+}
+.readout-sub .dot { color: rgba(236, 234, 229, 0.22); padding: 0 var(--space-2); }
+.readout-sub b {
+	font-family: var(--font-data);
+	font-weight: 500;
+	color: var(--on-shelf);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Range visualization ---------- */
+
+.rangeviz { margin-top: clamp(24px, 3vw, 34px); }
+
+.rangeviz-head {
+	display: flex;
+	gap: var(--space-4);
+	justify-content: space-between;
+	align-items: baseline;
+	font-family: var(--font-data);
+	font-size: 10px;
+	letter-spacing: 0.13em;
+	text-transform: uppercase;
+	color: var(--on-shelf-2);
+	margin-bottom: var(--space-3);
+}
+.rangeviz-head .caption { color: rgba(236, 234, 229, 0.34); letter-spacing: 0.1em; }
+
+.rangeviz-plot {
+	position: relative;
+	height: 62px;
+}
+.rangeviz-plot svg { display: block; width: 100%; height: 42px; overflow: visible; }
+
+/* The distribution curve is drawn from the comps, not decorative: its width is
+   the confidence band and its peak is the estimate. */
+.band-fill { fill: rgba(236, 234, 229, 0.13); }
+.dist-fill { fill: rgba(236, 234, 229, 0.11); }
+.dist-line { fill: none; stroke: rgba(236, 234, 229, 0.4); stroke-width: 1; }
+.dist-axis { stroke: var(--rule-on-shelf); stroke-width: 1; }
+.comp-tick { stroke: rgba(236, 234, 229, 0.42); stroke-width: 1; }
+
+.range-marker {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	height: 42px;
+	width: 2px;
+	background: var(--amber-bright);
+	transform: translateX(-1px);
+	transition: left var(--dur-slow) var(--ease);
+}
+.range-marker::after {
+	content: '';
+	position: absolute;
+	top: -4px;
+	left: 50%;
+	width: 7px;
+	height: 7px;
+	background: var(--amber-bright);
+	transform: translate(-50%, 0) rotate(45deg);
+}
+
+.rangeviz-bounds {
+	display: flex;
+	justify-content: space-between;
+	margin-top: var(--space-2);
+	font-family: var(--font-data);
+	font-size: var(--text-sm);
+	font-variant-numeric: tabular-nums;
+	color: var(--on-shelf);
+}
+.rangeviz-bounds span { color: var(--on-shelf-2); font-size: 10px; display: block; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; }
+.rangeviz-bounds .hi { text-align: right; }
+
+/* Shown only when the decant split value takes over from the street model —
+   a real branch in the pricing model, so it gets a real annotation. */
+.floor-note {
+	margin-top: var(--space-4);
+	padding-top: var(--space-3);
+	border-top: 1px solid var(--rule-on-shelf);
+	font-size: var(--text-micro);
+	color: var(--on-shelf-2);
+	line-height: 1.55;
+	display: flex;
+	gap: var(--space-3);
+}
+.floor-note b { color: var(--on-shelf); font-weight: 600; }
+.floor-note svg { flex-shrink: 0; margin-top: 2px; color: var(--amber-bright); }
+
+/* ---------- Confidence ----------
+   Three segments filling left to right. A count of evidence, not a badge. */
+
+.conf {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+}
+.conf-bars { display: flex; gap: 3px; align-items: flex-end; }
+.conf-bars i {
+	width: 7px;
+	height: 8px;
+	background: rgba(236, 234, 229, 0.22);
+	transition: background var(--dur) var(--ease);
+}
+/* Stepped heights so the meter reads as a scale even in monochrome. */
+.conf-bars i:nth-child(1) { height: 6px; }
+.conf-bars i:nth-child(2) { height: 9px; }
+.conf-bars i:nth-child(3) { height: 12px; }
+.conf-bars i.on { background: var(--on-shelf); }
+.conf-label {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--on-shelf);
+}
+
+/* ---------- Supporting sections ---------- */
+
+.support { margin-top: clamp(26px, 3.4vw, 36px); }
+
+.support-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-4);
+	margin-bottom: var(--space-3);
+	padding-bottom: var(--space-2);
+	border-bottom: 1px solid var(--rule-strong);
+}
+.support-head h3 {
+	font-family: var(--font-ui);
+	font-size: var(--text-micro);
+	font-weight: 600;
+	letter-spacing: 0.11em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+	margin: 0;
+}
+
+/* ---------- Market activity ---------- */
+
+.comps-list { display: block; }
+.comp-row {
+	display: grid;
+	grid-template-columns: 52px minmax(0, 1fr) auto;
+	align-items: baseline;
+	gap: var(--space-4);
+	padding: 9px 0;
+	border-bottom: 1px solid var(--rule);
+	font-size: var(--text-sm);
+}
+.comp-row:last-child { border-bottom: 0; }
+.comp-date {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	color: var(--ink-3);
+	font-variant-numeric: tabular-nums;
+}
+.comp-spec { color: var(--ink-2); min-width: 0; }
+.comp-spec b {
+	font-family: var(--font-data);
+	font-weight: 500;
+	color: var(--ink);
+	font-variant-numeric: tabular-nums;
+}
+.comp-price {
+	font-family: var(--font-data);
+	font-size: var(--text-base);
+	font-weight: 500;
+	color: var(--ink);
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+}
+
+/* ---------- Trend ---------- */
+
+.trend-toggle { display: flex; gap: 1px; }
+.trend-toggle button {
+	border: 0;
+	background: transparent;
+	font-family: var(--font-data);
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	color: var(--ink-3);
+	padding: 3px 7px;
+	cursor: pointer;
+	border-radius: 2px;
+	transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.trend-toggle button:hover { color: var(--ink); background: var(--paper); }
+.trend-toggle button[aria-pressed='true'] { color: var(--paper); background: var(--ink); }
+
+.trend-body {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+	gap: var(--space-5);
+}
+.trend-chart { min-width: 0; }
+.spark-wrap { position: relative; }
+.trend-chart svg { display: block; width: 100%; height: 56px; overflow: visible; }
+.spark-line { fill: none; stroke: var(--ink); stroke-width: 1.25; stroke-linejoin: round; stroke-linecap: round; }
+.spark-area { fill: rgba(22, 24, 26, 0.045); }
+.spark-dot {
+	position: absolute;
+	right: 0;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: var(--ink);
+	transform: translate(50%, -50%);
+	pointer-events: none;
+}
+
+.trend-figure { text-align: right; }
+.trend-change {
+	font-family: var(--font-data);
+	font-size: var(--text-lg);
+	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+	color: var(--ink);
+	letter-spacing: -0.01em;
+	display: block;
+}
+.trend-caption {
+	font-family: var(--font-data);
+	font-size: 10px;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+	margin-top: 2px;
+}
+
+/* ---------- Price factors ----------
+   Signed bars off a centre axis. Kept achromatic: in this system chroma means
+   volume, so direction is carried by side and label instead of by hue. */
+
+.factor-note {
+	font-size: var(--text-micro);
+	color: var(--ink-2);
+	line-height: 1.55;
+	margin: 0 0 var(--space-3);
+	padding-left: var(--space-3);
+	border-left: 2px solid var(--rule-strong);
+}
+.factor-note b { font-family: var(--font-data); font-weight: 500; color: var(--ink); }
+
+.factor-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 108px 56px;
+	align-items: center;
+	gap: var(--space-4);
+	padding: 8px 0;
+	border-bottom: 1px solid var(--rule);
+}
+.factor-row:last-child { border-bottom: 0; }
+.factor-name { font-size: var(--text-sm); color: var(--ink); min-width: 0; }
+.factor-name span { display: block; font-size: var(--text-micro); color: var(--ink-3); margin-top: 1px; }
+
+.factor-bar { position: relative; height: 5px; background: var(--paper); border-radius: 1px; }
+.factor-bar::before {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: -3px;
+	bottom: -3px;
+	width: 1px;
+	background: var(--rule-strong);
+}
+.factor-bar i {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	background: var(--ink);
+	border-radius: 1px;
+	transition: width var(--dur-slow) var(--ease), left var(--dur-slow) var(--ease), right var(--dur-slow) var(--ease);
+}
+.factor-bar i.neg { background: var(--ink-3); }
+
+.factor-delta {
+	font-family: var(--font-data);
+	font-size: var(--text-sm);
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+	color: var(--ink);
+}
+.factor-delta.neg { color: var(--ink-3); }
+
+/* ---------- Empty state ----------
+   Not blank: a dimmed rehearsal of the object that will appear, so the reader
+   knows what they are waiting for. */
+
+.readout.is-empty { background: var(--shelf); }
+.readout.is-empty .readout-value { color: rgba(236, 234, 229, 0.14); }
+.readout.is-empty .readout-value .cur { color: rgba(236, 234, 229, 0.11); }
+.readout.is-empty .range-marker { background: rgba(236, 234, 229, 0.2); }
+.readout.is-empty .range-marker::after { background: rgba(236, 234, 229, 0.2); }
+.readout.is-empty .rangeviz-bounds { color: rgba(236, 234, 229, 0.22); }
+
+.empty-note {
+	margin-top: var(--space-5);
+	padding-top: var(--space-4);
+	border-top: 1px solid var(--rule-on-shelf);
+	font-size: var(--text-sm);
+	color: var(--on-shelf-2);
+	line-height: 1.6;
+	max-width: 42ch;
+}
+
+.support-stack.is-empty { opacity: 0.4; pointer-events: none; }
+.support-stack.is-empty .comp-price,
+.support-stack.is-empty .comp-spec b,
+.support-stack.is-empty .factor-delta { color: var(--ink-3); }
+
+/* ---------- Stale ----------
+   Configuration changed after an estimate. The number is not wrong, it is out
+   of date, so it dims rather than disappears. */
+
+.est-result.is-stale .readout { opacity: 0.42; }
+.est-result.is-stale .support { opacity: 0.42; }
+
+.stale-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-4);
+	margin-bottom: var(--space-4);
+	padding: 10px var(--space-4);
+	background: var(--paper);
+	border: 1px solid var(--rule-strong);
+	border-left: 2px solid var(--ink);
+	border-radius: var(--r-sm);
+	font-size: var(--text-sm);
+	color: var(--ink-2);
+	animation: stale-in var(--dur) var(--ease) both;
+}
+@keyframes stale-in {
+	from { opacity: 0; transform: translateY(-4px); }
+	to { opacity: 1; transform: none; }
+}
+.stale-bar button {
+	border: 1px solid var(--ink);
+	background: var(--ink);
+	color: var(--paper);
+	font-family: var(--font-ui);
+	font-size: var(--text-micro);
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	padding: 6px var(--space-4);
+	border-radius: var(--r-sm);
+	cursor: pointer;
+	white-space: nowrap;
+	transition: background var(--dur-fast) var(--ease);
+}
+.stale-bar button:hover { background: #000; }
+
+/* ---------- Refusal ----------
+   Under three comparable sales there is no defensible number, so the tool
+   declines instead of inventing one. */
+
+.refusal {
+	background: var(--shelf);
+	color: var(--on-shelf);
+	border-radius: var(--r-sm);
+	padding: clamp(22px, 3vw, 32px);
+}
+.refusal .rlabel {
+	font-family: var(--font-data);
+	font-size: 10px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--amber-bright);
+	margin-bottom: var(--space-3);
+}
+.refusal h3 {
+	font-family: var(--font-display);
+	font-variation-settings: 'opsz' 24;
+	font-size: var(--text-xl);
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	margin: 0 0 var(--space-3);
+	line-height: 1.15;
+}
+.refusal p {
+	font-size: var(--text-sm);
+	color: var(--on-shelf-2);
+	line-height: 1.6;
+	margin: 0;
+	max-width: 46ch;
+}
+
+/* ---------- Mobile summary ----------
+   After an estimate the value stays reachable while the reader keeps editing,
+   instead of scrolling away above the controls. */
+
+.est-sticky {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 60;
+	background: var(--shelf);
+	color: var(--on-shelf);
+	border-top: 1px solid rgba(0, 0, 0, 0.4);
+	padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
+	display: none;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-4);
+	transform: translateY(100%);
+	transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.est-sticky.show { transform: none; }
+.est-sticky .lbl {
+	font-family: var(--font-data);
+	font-size: 9px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--on-shelf-2);
+	display: block;
+	margin-bottom: 1px;
+}
+.est-sticky .v {
+	font-family: var(--font-data);
+	font-size: var(--text-lg);
+	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+}
+.est-sticky .r {
+	font-family: var(--font-data);
+	font-size: var(--text-micro);
+	color: var(--on-shelf-2);
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+}
+.est-sticky.stale .v { color: var(--on-shelf-2); }
+
+/* ---------- Responsive ----------
+   The mobile layout is not the desktop one collapsed: controls lead, the
+   result follows them in reading order, and the value is pinned within reach
+   rather than left at the bottom of the page. */
+
+@media (max-width: 999px) {
+	.est-workspace {
+		grid-template-columns: minmax(0, 1fr);
+		border-bottom: 0;
+	}
+	.est-config {
+		padding: var(--est-pad) 0 var(--space-8);
+		border-right: 0;
+		border-bottom: 1px solid var(--est-rule);
+	}
+	.est-result {
+		padding: var(--est-pad) var(--space-5) var(--space-10);
+		margin: 0 calc(var(--gutter) * -1);
+		box-shadow: none;
+	}
+	.est-sticky { display: flex; }
+	.estimator { padding-bottom: 68px; }
+}
+
+@media (max-width: 620px) {
+	.est-masthead {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--space-4);
+	}
+	.est-provenance { text-align: left; }
+	.tiles { grid-template-columns: 1fr; }
+	.trend-body { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
+	.trend-figure { text-align: left; display: flex; align-items: baseline; gap: var(--space-3); }
+	.trend-caption { margin-top: 0; }
+	.factor-row { grid-template-columns: minmax(0, 1fr) 64px; }
+	/* Two letter-spaced captions cannot share a narrow line. The bounds row
+	   below already names the axis, so the explanatory half is the one to go. */
+	.rangeviz-head .caption { display: none; }
+	.est-masthead .lede { max-width: none; }
+	.factor-bar { display: none; }
+	.comp-row { grid-template-columns: 46px minmax(0, 1fr) auto; gap: var(--space-3); }
+	/* Touch targets stay comfortable where the desktop sizes were tuned for a
+	   cursor. */
+	.seg button { padding: 13px var(--space-2); }
+	.tile { padding: var(--space-4); padding-right: 34px; }
+	.stepper button { width: 46px; }
+	.gauge-track { height: 42px; }
+}
+
+/* ---------- Reduced motion ----------
+   marketplace.css already flattens durations globally. These are the pieces
+   with their own JS-driven movement, which that rule cannot reach. */
+
+@media (prefers-reduced-motion: reduce) {
+	.range-marker,
+	.gauge-fill,
+	.gauge-edge,
+	.rail-marker,
+	.factor-bar i { transition: none; }
+	.est-btn:active:not(:disabled) { transform: none; }
+	.stale-bar { animation: none; }
+}

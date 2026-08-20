@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Price Estimator - Vial</title>
+	<meta name="description" content="Estimate what a part-used fragrance bottle is worth, from fill level, condition, batch year and comparable sales." />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Piazzolla:opsz,wght@8..30,400..800&family=Archivo:wght@400..700&family=Azeret+Mono:wght@400;500&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="css/marketplace.css" />
+	<link rel="stylesheet" href="css/estimate.css" />
+</head>
+<body>
+
+	<div id="demo-banner"></div>
+
+	<header class="site-header">
+		<div class="container header-main">
+			<a href="index.html" class="logo">Vi<span>al</span></a>
+			<form class="header-search" id="header-search-form">
+				<input type="text" id="header-search-input" placeholder="Search brand, scent, or notes…" />
+				<button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+			</form>
+			<div class="header-actions" id="header-actions"></div>
+		</div>
+		<div class="header-categories" id="category-nav"></div>
+	</header>
+
+	<main class="estimator">
+		<div class="est-shell">
+
+			<div class="est-masthead">
+				<div>
+					<h1>What is this bottle worth?</h1>
+					<p class="lede">Fill level, condition and batch year against recent sales of the same fragrance. Sealed bottles and part-used ones price differently, and this accounts for the difference.</p>
+				</div>
+				<div class="est-provenance">
+					Assay engine <b>v0.1</b><br />
+					Mock data &middot; <b>1,284</b> comparable sales
+				</div>
+			</div>
+
+			<div class="est-workspace">
+
+				<!-- ---------- Configuration ---------- -->
+				<section class="est-config" aria-labelledby="config-heading">
+					<h2 id="config-heading" class="sr-only">Configure the bottle</h2>
+
+					<div class="est-section">
+						<div class="est-step">
+							<span class="n">01</span>
+							<h2>Choose the fragrance</h2>
+							<span class="rule"></span>
+						</div>
+						<div class="combo" id="combo"></div>
+						<div id="identity" hidden></div>
+					</div>
+
+					<div class="est-section" id="config" hidden></div>
+
+					<div class="est-action">
+						<button type="button" class="est-btn" id="est-btn" disabled>
+							<span class="label">Estimate price</span>
+							<span class="arrow"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></span>
+							<span class="progress"></span>
+						</button>
+						<p class="est-status" id="est-status" role="status" aria-live="polite">Select a bottle to begin</p>
+					</div>
+				</section>
+
+				<!-- ---------- Valuation ---------- -->
+				<section class="est-result" id="est-result" aria-labelledby="result-heading">
+					<div class="est-result-inner">
+
+						<div class="stale-bar" id="stale-bar" hidden>
+							<span>The bottle changed. This valuation is out of date.</span>
+							<button type="button" id="stale-refresh">Update estimate</button>
+						</div>
+
+						<div class="result-head">
+							<h2 id="result-heading">Valuation</h2>
+							<span class="meta" id="result-meta">No bottle selected</span>
+						</div>
+
+						<div class="readout is-empty" id="readout"></div>
+
+						<div class="support-stack is-empty" id="support"></div>
+
+					</div>
+				</section>
+
+			</div>
+
+		</div>
+	</main>
+
+	<div class="est-sticky" id="est-sticky" aria-hidden="true">
+		<div>
+			<span class="lbl">Estimated value</span>
+			<span class="v">&mdash;</span>
+		</div>
+		<div class="r">&mdash;</div>
+	</div>
+
+	<footer class="site-footer">
+		<div class="container footer-inner"><span class="logo footer-logo">Vi<span>al</span></span><span class="footer-tag">Fragrance that changes hands, not a landfill trip.</span></div>
+	</footer>
+
+	<script type="module" src="js/nav.js"></script>
+	<script type="module" src="js/estimate.js"></script>
+</body>
+</html>

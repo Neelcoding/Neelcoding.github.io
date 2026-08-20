@@ -1,1 +1,7 @@
 .impeccable/questions/
+
+# Supabase CLI scratch state, not part of the site.
+supabase/.temp/
+
+# Local strategy notes. Kept out of a public repo on purpose.
+assay/
