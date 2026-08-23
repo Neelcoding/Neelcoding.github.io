@@ -19,6 +19,7 @@ create table if not exists public.assay_fragrances (
 	house text not null,
 	released integer,
 	family text,
+	gender text not null default 'unisex' check (gender in ('men', 'women', 'unisex')),
 	-- A: in production, heavily discounted. B: in production, little
 	-- discounting. C: discontinued or reformulated, priced off comps alone.
 	regime text not null default 'A' check (regime in ('A', 'B', 'C')),
@@ -168,16 +169,60 @@ create policy "Anyone can log a valuation"
 -- ---------- Seed catalogue ----------
 -- Mirrors the fragrances the estimator ships with, so the ingester has
 -- something to search for on its first run. Safe to re-run.
-insert into public.assay_fragrances (slug, name, house, released, family, regime, sizes, search_query)
+insert into public.assay_fragrances (slug, name, house, released, family, gender, regime, sizes, search_query)
 values
-	('aventus', 'Aventus', 'Creed', 2010, 'Fruity chypre', 'B', '{50,100,120}', 'Creed Aventus'),
-	('baccarat-540', 'Baccarat Rouge 540', 'Maison Francis Kurkdjian', 2015, 'Amber floral', 'B', '{70,200}', 'Baccarat Rouge 540'),
-	('sauvage-edp', 'Sauvage Eau de Parfum', 'Dior', 2018, 'Aromatic fougere', 'A', '{60,100}', 'Dior Sauvage Eau de Parfum'),
-	('bleu-de-chanel', 'Bleu de Chanel Parfum', 'Chanel', 2018, 'Woody aromatic', 'A', '{50,100}', 'Bleu de Chanel Parfum'),
-	('oud-wood', 'Oud Wood', 'Tom Ford', 2007, 'Woody oriental', 'B', '{50,100}', 'Tom Ford Oud Wood'),
-	('mitsouko-vintage', 'Mitsouko (pre-2013 formula)', 'Guerlain', 1919, 'Chypre', 'C', '{75}', 'Guerlain Mitsouko vintage'),
-	('kouros-vintage', 'Kouros (vintage splash)', 'Yves Saint Laurent', 1981, 'Aromatic fougere', 'C', '{100}', 'YSL Kouros vintage'),
-	('layton', 'Layton', 'Parfums de Marly', 2016, 'Amber vanilla', 'B', '{125}', 'Parfums de Marly Layton')
+	-- Regime A: routinely discounted 40-60% below MSRP, so street price sits
+	-- far under sticker and MSRP is useless as an anchor.
+	('sauvage-edp', 'Sauvage Eau de Parfum', 'Dior', 2018, 'Aromatic fougere', 'men', 'A', '{60,100,200}', 'Dior Sauvage Eau de Parfum'),
+	('sauvage-elixir', 'Sauvage Elixir', 'Dior', 2021, 'Spicy amber', 'men', 'A', '{60,100}', 'Dior Sauvage Elixir'),
+	('dior-homme-intense', 'Dior Homme Intense', 'Dior', 2011, 'Iris woody', 'men', 'A', '{50,100}', 'Dior Homme Intense'),
+	('eros-edt', 'Eros', 'Versace', 2012, 'Aromatic fougere', 'men', 'A', '{30,50,100,200}', 'Versace Eros Eau de Toilette'),
+	('one-million', '1 Million', 'Paco Rabanne', 2008, 'Spicy leather', 'men', 'A', '{50,100,200}', 'Paco Rabanne 1 Million'),
+	('invictus', 'Invictus', 'Paco Rabanne', 2013, 'Aquatic woody', 'men', 'A', '{50,100,200}', 'Paco Rabanne Invictus'),
+	('acqua-di-gio', 'Acqua di Gio', 'Giorgio Armani', 1996, 'Aquatic', 'men', 'A', '{50,100,200}', 'Armani Acqua di Gio Eau de Toilette'),
+	('stronger-with-you', 'Stronger With You', 'Giorgio Armani', 2017, 'Sweet spicy', 'men', 'A', '{50,100}', 'Armani Stronger With You'),
+	('le-male', 'Le Male', 'Jean Paul Gaultier', 1995, 'Aromatic fougere', 'men', 'A', '{75,125,200}', 'Jean Paul Gaultier Le Male'),
+	('la-nuit-de-lhomme', 'La Nuit de L''Homme', 'Yves Saint Laurent', 2009, 'Woody spicy', 'men', 'A', '{60,100}', 'YSL La Nuit de L Homme'),
+	('ysl-y-edp', 'Y Eau de Parfum', 'Yves Saint Laurent', 2018, 'Aromatic fougere', 'men', 'A', '{60,100}', 'YSL Y Eau de Parfum'),
+	('the-most-wanted', 'The Most Wanted', 'Azzaro', 2021, 'Spicy amber', 'men', 'A', '{50,100}', 'Azzaro The Most Wanted'),
+	('bad-boy', 'Bad Boy', 'Carolina Herrera', 2019, 'Spicy woody', 'men', 'A', '{50,100}', 'Carolina Herrera Bad Boy'),
+	('prada-lhomme', 'L''Homme', 'Prada', 2016, 'Iris woody', 'men', 'A', '{50,100,150}', 'Prada L Homme'),
+	('khamrah', 'Khamrah', 'Lattafa', 2022, 'Spicy vanilla', 'unisex', 'A', '{100}', 'Lattafa Khamrah'),
+	('jadore-edp', 'J''adore Eau de Parfum', 'Dior', 1999, 'Floral', 'women', 'A', '{30,50,100}', 'Dior J adore Eau de Parfum'),
+	('miss-dior-edp', 'Miss Dior Eau de Parfum', 'Dior', 2017, 'Floral chypre', 'women', 'A', '{30,50,100}', 'Miss Dior Eau de Parfum'),
+	('libre-edp', 'Libre Eau de Parfum', 'Yves Saint Laurent', 2019, 'Floral lavender', 'women', 'A', '{30,50,90}', 'YSL Libre Eau de Parfum'),
+	('black-opium', 'Black Opium', 'Yves Saint Laurent', 2014, 'Coffee vanilla', 'women', 'A', '{30,50,90}', 'YSL Black Opium Eau de Parfum'),
+	('la-vie-est-belle', 'La Vie Est Belle', 'Lancome', 2012, 'Sweet gourmand', 'women', 'A', '{30,50,100}', 'Lancome La Vie Est Belle'),
+	('idole-edp', 'Idole', 'Lancome', 2019, 'Floral chypre', 'women', 'A', '{25,50,75}', 'Lancome Idole Eau de Parfum'),
+	('flowerbomb', 'Flowerbomb', 'Viktor & Rolf', 2005, 'Floral gourmand', 'women', 'A', '{30,50,100}', 'Viktor Rolf Flowerbomb'),
+	('daisy-edt', 'Daisy', 'Marc Jacobs', 2007, 'Floral woody', 'women', 'A', '{50,100}', 'Marc Jacobs Daisy Eau de Toilette'),
+	('by-the-fireplace', 'Replica By the Fireplace', 'Maison Margiela', 2015, 'Woody gourmand', 'unisex', 'A', '{30,100}', 'Maison Margiela Replica By the Fireplace'),
+
+	-- Regime B: little or no discounting, so street price sits close to MSRP
+	-- and the decant split floor starts to bite at the top of the range.
+	('aventus', 'Aventus', 'Creed', 2010, 'Fruity chypre', 'men', 'B', '{50,100,120}', 'Creed Aventus'),
+	('green-irish-tweed', 'Green Irish Tweed', 'Creed', 1985, 'Fresh fougere', 'men', 'B', '{50,100}', 'Creed Green Irish Tweed'),
+	('baccarat-540', 'Baccarat Rouge 540', 'Maison Francis Kurkdjian', 2015, 'Amber floral', 'unisex', 'B', '{35,70,200}', 'Baccarat Rouge 540'),
+	('grand-soir', 'Grand Soir', 'Maison Francis Kurkdjian', 2016, 'Amber vanilla', 'unisex', 'B', '{70,200}', 'MFK Grand Soir'),
+	('oud-wood', 'Oud Wood', 'Tom Ford', 2007, 'Woody oriental', 'unisex', 'B', '{30,50,100}', 'Tom Ford Oud Wood'),
+	('tobacco-vanille', 'Tobacco Vanille', 'Tom Ford', 2007, 'Spicy vanilla', 'unisex', 'B', '{50,100}', 'Tom Ford Tobacco Vanille'),
+	('layton', 'Layton', 'Parfums de Marly', 2016, 'Amber vanilla', 'unisex', 'B', '{75,125}', 'Parfums de Marly Layton'),
+	('herod', 'Herod', 'Parfums de Marly', 2012, 'Tobacco vanilla', 'men', 'B', '{75,125}', 'Parfums de Marly Herod'),
+	('delina', 'Delina', 'Parfums de Marly', 2017, 'Floral fruity', 'women', 'B', '{30,75}', 'Parfums de Marly Delina'),
+	('oud-for-greatness', 'Oud for Greatness', 'Initio', 2019, 'Woody oud', 'unisex', 'B', '{90}', 'Initio Oud for Greatness'),
+	('naxos', 'Naxos', 'Xerjoff', 2015, 'Tobacco honey', 'unisex', 'B', '{50,100}', 'Xerjoff Naxos'),
+	('santal-33', 'Santal 33', 'Le Labo', 2011, 'Woody sandalwood', 'unisex', 'B', '{50,100}', 'Le Labo Santal 33'),
+	('gypsy-water', 'Gypsy Water', 'Byredo', 2008, 'Woody aromatic', 'unisex', 'B', '{50,100}', 'Byredo Gypsy Water'),
+	('bleu-de-chanel', 'Bleu de Chanel Parfum', 'Chanel', 2018, 'Woody aromatic', 'men', 'B', '{50,100,150}', 'Bleu de Chanel Parfum'),
+	('coco-mademoiselle', 'Coco Mademoiselle', 'Chanel', 2001, 'Floral chypre', 'women', 'B', '{35,50,100}', 'Chanel Coco Mademoiselle Eau de Parfum'),
+	('chance-eau-tendre', 'Chance Eau Tendre', 'Chanel', 2010, 'Floral fruity', 'women', 'B', '{35,50,100}', 'Chanel Chance Eau Tendre'),
+
+	-- Regime C: discontinued or reformulated. No street anchor exists, age
+	-- reads as provenance rather than decay, and comps carry the price alone.
+	('mitsouko-vintage', 'Mitsouko (pre-2013 formula)', 'Guerlain', 1919, 'Chypre', 'women', 'C', '{50,75,100}', 'Guerlain Mitsouko vintage'),
+	('kouros-vintage', 'Kouros (vintage splash)', 'Yves Saint Laurent', 1981, 'Aromatic fougere', 'men', 'C', '{50,100}', 'YSL Kouros vintage'),
+	('angel-vintage', 'Angel (pre-reformulation)', 'Thierry Mugler', 1992, 'Gourmand', 'women', 'C', '{25,50,100}', 'Thierry Mugler Angel vintage'),
+	('fahrenheit-vintage', 'Fahrenheit (vintage)', 'Dior', 1988, 'Leather floral', 'men', 'C', '{50,100}', 'Dior Fahrenheit vintage')
 on conflict (slug) do nothing;
 
 -- ---------- Seed model parameters ----------
