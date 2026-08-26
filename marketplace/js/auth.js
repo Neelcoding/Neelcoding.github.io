@@ -224,7 +224,6 @@ async function renderPayouts() {
 	if (status.payoutsEnabled) {
 		body.innerHTML = `
 			<p class="payout-state is-ready"><span class="payout-dot" aria-hidden="true"></span>Your payout account is active.</p>
-			<p class="hint">When a bottle sells, the price goes to your bank on Stripe's normal schedule and Vial keeps the 5% processing fee. You never handle the payment yourself.</p>
 			<button class="btn btn-outline btn-sm" id="payout-dashboard">View payouts on Stripe</button>
 		`;
 		document.getElementById('payout-dashboard')?.addEventListener('click', async (e) => {

@@ -322,15 +322,19 @@ function sellerCanBePaid(listing) {
 	return !!listing.profiles?.stripe_payouts_enabled;
 }
 
+// Must match PROCESSING_FEE_RATE in supabase/functions/create-checkout-session.
+// This is the number quoted to the buyer; that one is the number charged.
+const PROCESSING_FEE_RATE = 0.06;
+
 function buyNowFeeNote(listing) {
 	const live = isSupabaseConfigured && !listing.is_auction && listing.status !== 'sold';
 	if (!live) return '';
 	if (!sellerCanBePaid(listing)) {
 		return `<div class="hint" style="margin:-10px 0 20px;">This seller hasn't finished setting up payouts, so instant checkout is off. You can still make an offer or message them.</div>`;
 	}
-	const fee = Number(listing.price) * 0.05;
+	const fee = Number(listing.price) * PROCESSING_FEE_RATE;
 	const total = Number(listing.price) + fee;
-	return `<div class="hint" style="margin:-10px 0 20px;">+ 5% processing fee ($${fee.toFixed(2)}) at checkout, $${total.toFixed(2)} total</div>`;
+	return `<div class="hint" style="margin:-10px 0 20px;">+ ${Math.round(PROCESSING_FEE_RATE * 100)}% processing fee ($${fee.toFixed(2)}) at checkout, $${total.toFixed(2)} total</div>`;
 }
 
 function boxLabel(value) {

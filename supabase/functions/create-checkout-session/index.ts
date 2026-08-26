@@ -8,8 +8,12 @@
 // One economic note worth knowing: on a destination charge the platform is the
 // merchant of record, so Stripe's own processing fee (roughly 2.9% + 30c) comes
 // out of the platform's side, not the seller's. On a $100 bottle that means
-// $5.00 collected, about $3.35 paid to Stripe, so the real margin is nearer 1.6%
-// than 5%. Raising PROCESSING_FEE_RATE is the lever if that needs to change.
+// $6.00 collected, about $3.37 paid to Stripe, so the real margin is nearer 2.6%
+// than 6%.
+//
+// The fixed 30c component is what hurts: at 6% the platform only breaks even
+// around a $10 listing, and loses money below it. A minimum fee rather than a
+// flat percentage is the fix if cheap bottles turn out to be common.
 //
 // Deploy via the Supabase Dashboard: Edge Functions -> Deploy a new function -> "Via Editor".
 // Requires secrets: STRIPE_SECRET_KEY, SUPABASE_SERVICE_ROLE_KEY.
@@ -18,7 +22,10 @@ const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!;
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const PROCESSING_FEE_RATE = 0.05;
+// Keep in sync with PROCESSING_FEE_RATE in marketplace/js/listing.js, which
+// quotes this number to the buyer before checkout. If the two drift, the buyer
+// is shown a total that is not what they are charged.
+const PROCESSING_FEE_RATE = 0.06;
 
 // Fragrance is a flammable liquid, so it ships under ground-only rules that
 // carriers apply domestically and largely refuse across borders. Collecting an
