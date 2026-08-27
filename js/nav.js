@@ -40,7 +40,7 @@ function renderDemoBanner() {
 	const el = document.getElementById('demo-banner');
 	if (!el) return;
 	if (isSupabaseConfigured) return;
-	el.innerHTML = `<div class="demo-banner"><strong>Demo mode:</strong> Supabase isn't connected yet, so listings, accounts, and photos are stored only in this browser. See <code>marketplace/sql/schema.sql</code> and <code>marketplace/js/supabase-client.js</code> to go live.</div>`;
+	el.innerHTML = `<div class="demo-banner"><strong>Demo mode:</strong> Supabase isn't connected yet, so listings, accounts, and photos are stored only in this browser. See <code>sql/schema.sql</code> and <code>js/supabase-client.js</code> to go live.</div>`;
 }
 
 async function renderHeaderActions() {

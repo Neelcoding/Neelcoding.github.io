@@ -18,7 +18,7 @@ Without this, creating a seller account returns an error and nobody can onboard.
 ## 2. Run the database migration
 
 Supabase Dashboard → **SQL Editor** → **New query** → paste the whole of
-`marketplace/sql/005_payouts_and_orders.sql` → **Run**.
+`sql/005_payouts_and_orders.sql` → **Run**.
 
 This adds the payout columns to `profiles`, creates the `orders` table, and
 installs the three functions that let sellers mark orders shipped and buyers

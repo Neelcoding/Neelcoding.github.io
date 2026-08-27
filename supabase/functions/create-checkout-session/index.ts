@@ -22,7 +22,7 @@ const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!;
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-// Keep in sync with PROCESSING_FEE_RATE in marketplace/js/listing.js, which
+// Keep in sync with PROCESSING_FEE_RATE in js/listing.js, which
 // quotes this number to the buyer before checkout. If the two drift, the buyer
 // is shown a total that is not what they are charged.
 const PROCESSING_FEE_RATE = 0.06;

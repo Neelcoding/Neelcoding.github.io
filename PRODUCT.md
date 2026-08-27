@@ -79,7 +79,7 @@ Technical constraints:
   listings, offers, bids, conversations, messages, orders.
 - Stripe Checkout and Connect via edge functions. Going live needs dashboard
   steps only the account owner can take; see `SETUP-PAYOUTS.md`.
-- Hosted on GitHub Pages at neelcoding.github.io/marketplace/.
+- Hosted on GitHub Pages at usevial.com.
 
 Open and explicitly undecided:
 
@@ -108,8 +108,8 @@ Open and explicitly undecided:
 
 ## Evidence on Hand
 
-- One licensed hero photograph at `marketplace/images/hero-spray.jpg`.
-- Demo fixtures in `marketplace/js/mock-data.js` referencing real houses
+- One licensed hero photograph at `images/hero-spray.jpg`.
+- Demo fixtures in `js/mock-data.js` referencing real houses
   (Dior, Chanel, YSL, Tom Ford). These render only in demo mode when Supabase
   is unconfigured. They are placeholders, not inventory or partnerships.
 
