@@ -69,7 +69,7 @@ export async function hydrate(slug) {
 				.order('observed_at', { ascending: false })
 				.limit(400),
 			sb.from('assay_street_prices')
-				.select('size_ml, price, observed_at')
+				.select('size_ml, price, observed_at, source')
 				.eq('fragrance_id', frag.id)
 				.gte('observed_at', since)
 				.limit(400),
@@ -77,16 +77,26 @@ export async function hydrate(slug) {
 
 		if (!comps?.length && !street?.length) return false;
 
+
 		// One street price per size, taken as the median of what is listed. A
 		// median rather than the minimum, because the cheapest listing on eBay
 		// is usually the one that is wrong about something.
-		const byStreetSize = {};
+		// Seeded anchors and observed ones are kept apart. An observation for a
+		// size always wins over an estimate for the same size, and the estimated
+		// flag rides along so the model can refuse to sound confident about a
+		// number nobody has actually seen paid.
+		const observed = {};
+		const estimated = {};
 		for (const row of street || []) {
-			(byStreetSize[row.size_ml] ||= []).push(Number(row.price));
+			const bucket = row.source === 'estimate' ? estimated : observed;
+			(bucket[row.size_ml] ||= []).push(Number(row.price));
 		}
 		const streetPrices = {};
-		for (const [size, prices] of Object.entries(byStreetSize)) {
-			streetPrices[Number(size)] = Math.round(median(prices));
+		const streetEstimated = {};
+		for (const size of new Set([...Object.keys(observed), ...Object.keys(estimated)])) {
+			const real = observed[size];
+			streetPrices[Number(size)] = Math.round(median(real?.length ? real : estimated[size]));
+			streetEstimated[Number(size)] = !real?.length;
 		}
 
 		// Comps are reshaped into what the UI already renders, so the display
@@ -101,7 +111,7 @@ export async function hydrate(slug) {
 		}));
 
 		const soldCount = shaped.filter((c) => c.kind === 'sold').length;
-		setLive(slug, { comps: shaped, street: streetPrices, soldCount });
+		setLive(slug, { comps: shaped, street: streetPrices, streetEstimated, soldCount });
 		return true;
 	} catch {
 		// Tables absent, network down, key rotated: mock carries the page.

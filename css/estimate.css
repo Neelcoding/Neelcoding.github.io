@@ -995,6 +995,9 @@
 	gap: var(--space-3);
 }
 .floor-note b { color: var(--on-shelf); font-weight: 600; }
+/* The estimate caveat is information, not a warning, so it stays achromatic
+   rather than borrowing the amber reserved for volume. */
+.estimate-note svg { color: var(--on-shelf-2); }
 .floor-note svg { flex-shrink: 0; margin-top: 2px; color: var(--amber-bright); }
 
 /* ---------- Confidence ----------

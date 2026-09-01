@@ -233,8 +233,17 @@ export function estimate(config) {
 	}
 
 	const compCount = compsFor(item.id, size).length;
-	const band = compCount >= 8 ? 0.12 : compCount >= 3 ? 0.22 : 0.35;
-	const confidence = compCount >= 8 ? 'High' : compCount >= 3 ? 'Medium' : 'Low';
+	// An estimated anchor caps the claim regardless of how many comps exist:
+	// comps can tell you the spread of the market, but if the price the whole
+	// calculation hangs off was never observed, the answer cannot be called
+	// high confidence without lying about it.
+	const estimatedAnchor = item.regime !== 'C' && streetIsEstimated(item, size);
+	let band = compCount >= 8 ? 0.12 : compCount >= 3 ? 0.22 : 0.35;
+	let confidence = compCount >= 8 ? 'High' : compCount >= 3 ? 'Medium' : 'Low';
+	if (estimatedAnchor) {
+		band = Math.max(band, 0.35);
+		confidence = 'Low';
+	}
 
 	// Factors are reported as their deviation from neutral, so a reader can see
 	// which choices actually moved the number and by how much.
@@ -257,6 +266,7 @@ export function estimate(config) {
 		anchor,
 		anchorLabel,
 		floorBinds,
+		estimatedAnchor,
 		splitFloor: Math.round(splitFloor),
 		streetValue: Math.round(streetValue),
 		ownedYears,
@@ -374,6 +384,15 @@ export function streetFor(item, size) {
 	const live = LIVE.get(item.id);
 	if (live && live.street[size] != null) return live.street[size];
 	return item.street?.[size] ?? null;
+}
+
+/** True when the anchor is a seeded estimate rather than an observed price. */
+export function streetIsEstimated(item, size) {
+	const live = LIVE.get(item.id);
+	if (live && live.street[size] != null) return !!live.streetEstimated?.[size];
+	// The bundled figures are estimates too; they were written to exercise the
+	// model, not measured off a market.
+	return item.street?.[size] != null;
 }
 
 /** How much of what is on screen is real. Drives the provenance line. */

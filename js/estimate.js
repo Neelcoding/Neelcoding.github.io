@@ -38,6 +38,7 @@ const ICON_TICK = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" s
 const ICON_CLOSE = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 const ICON_ARROW = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>`;
 const ICON_SPLIT = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h6l3-7 3 14 3-7h3"/></svg>`;
+const ICON_INFO = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r=".6" fill="currentColor"/></svg>`;
 
 /* ---------- State ---------- */
 
@@ -665,6 +666,12 @@ function renderResult() {
 			</div>
 		</div>
 
+		${result.estimatedAnchor ? `
+			<div class="floor-note estimate-note">
+				${ICON_INFO}
+				<div><b>Model estimate.</b> No recorded sales back this yet. The anchor is a typical retail price for this bottle rather than one we have seen paid, so the range is deliberately wide.</div>
+			</div>` : ''}
+
 		${result.floorBinds ? `
 			<div class="floor-note">
 				${ICON_SPLIT}
@@ -696,9 +703,15 @@ function renderProvenance() {
 		el.innerHTML = 'Mock data';
 		return;
 	}
-	el.innerHTML = p.sold
-		? `Live data &middot; <b>${p.comps}</b> observations`
-		: `Live asking prices &middot; <b>${p.comps}</b> listings`;
+	if (p.comps) {
+		el.innerHTML = p.sold
+			? `Live data &middot; <b>${p.comps}</b> observations`
+			: `Live asking prices &middot; <b>${p.comps}</b> listings`;
+		return;
+	}
+	// Anchored but with nothing observed behind it. Saying "live" here would be
+	// the interface taking credit for data it does not have.
+	el.innerHTML = 'Estimated pricing';
 }
 
 function confLevel(c) {
