@@ -960,16 +960,17 @@ function init() {
 	$('#stale-refresh').addEventListener('click', runEstimate);
 
 	// Demo affordance: deep-link a bottle so every state is reachable directly.
-	const preset = new URLSearchParams(location.search).get('item');
-	if (preset) {
-		const item = catalogue.find((c) => c.id === preset);
-		if (item) selectItem(item);
-	}
-
 	// Catalogue comes from Supabase when it has one, so fragrances can be added
-	// without a redeploy.
+	// without a redeploy. This has to settle before a deep link is resolved:
+	// against the bundled set alone, ?item= only works for the handful of
+	// fragrances that ship in the code and silently fails for every row added
+	// to the database since.
 	loadCatalogue().then((list) => {
 		if (list?.length) catalogue = list;
+		const preset = new URLSearchParams(location.search).get('item');
+		if (!preset) return;
+		const item = catalogue.find((c) => c.id === preset);
+		if (item) selectItem(item);
 	});
 }
 
