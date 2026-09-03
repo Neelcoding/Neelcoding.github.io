@@ -82,4 +82,9 @@ from (values
 	-- branch of the model. They keep pricing off comparable sales alone.
 ) as v(slug, size_ml, price)
 join public.assay_fragrances f on f.slug = v.slug
-on conflict (source, external_id) do update set price = excluded.price, observed_at = now();
+-- The dedupe index in 006 is partial (where external_id is not null), and
+-- Postgres will only infer a partial index if the same predicate appears here.
+-- Without it: "no unique or exclusion constraint matching the ON CONFLICT
+-- specification".
+on conflict (source, external_id) where external_id is not null
+do update set price = excluded.price, observed_at = now();
