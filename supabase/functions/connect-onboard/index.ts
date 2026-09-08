@@ -117,7 +117,17 @@ Deno.serve(async (req) => {
 				return json({ connected: false, payoutsEnabled: false, detailsSubmitted: false });
 			}
 			const account = await stripe(`accounts/${profile.stripe_account_id}`, 'GET');
-			if (account.error) return json({ error: account.error.message }, 502);
+			if (account.error) {
+				// Same reasoning as in 'start': an account from the other mode is
+				// gone, not broken. Report it as not connected so the seller is
+				// offered onboarding rather than an error they cannot act on.
+				await patchProfile(user.id, {
+					stripe_account_id: null,
+					stripe_payouts_enabled: false,
+					stripe_details_submitted: false,
+				});
+				return json({ connected: false, payoutsEnabled: false, detailsSubmitted: false });
+			}
 			await cacheAccountFlags(user.id, account);
 			return json({
 				connected: true,
@@ -138,6 +148,26 @@ Deno.serve(async (req) => {
 		if (!origin) return json({ error: 'origin is required' }, 400);
 
 		let accountId = profile.stripe_account_id;
+
+		// A stored account id is not automatically usable. Test and live are
+		// separate universes in Stripe, so an id created under a test key does
+		// not exist under a live one, and the platform would otherwise try to
+		// resume onboarding for an account Stripe has never heard of, with no
+		// way for the seller to get past it. Anything unretrievable is treated
+		// as absent and replaced, and the cached flags are cleared with it so
+		// the interface stops claiming payouts work.
+		if (accountId) {
+			const existing = await stripe(`accounts/${accountId}`, 'GET');
+			if (existing.error) {
+				console.warn(`dropping unusable stripe account ${accountId}: ${existing.error.code ?? existing.error.message}`);
+				accountId = null;
+				await patchProfile(user.id, {
+					stripe_account_id: null,
+					stripe_payouts_enabled: false,
+					stripe_details_submitted: false,
+				});
+			}
+		}
 
 		if (!accountId) {
 			const created = await createAccount(user);
