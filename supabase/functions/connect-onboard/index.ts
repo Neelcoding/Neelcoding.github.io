@@ -68,6 +68,18 @@ async function createAccount(user: { id: string; email?: string }): Promise<{ id
 			contact_email: user.email ?? '',
 			identity: { country: 'us', entity_type: 'individual' },
 			configuration: {
+				// Both, not just recipient. Stripe gates accounts that receive
+				// transfers without also being able to take payments: it is the
+				// shape money transmitters have, so it needs approval, and
+				// requesting it alone fails live with "your platform needs
+				// approval for accounts to have requested the transfers
+				// capability without the card_payments capability".
+				//
+				// Sellers here never charge a card directly. The platform is
+				// merchant of record on a destination charge and forwards the
+				// money. Requesting card_payments is what makes this the
+				// ordinary marketplace shape rather than the gated one.
+				merchant: { capabilities: { card_payments: { requested: true } } },
 				recipient: { capabilities: { stripe_balance: { stripe_transfers: { requested: true } } } },
 			},
 			// Express gives the seller a hosted dashboard to see payouts and
@@ -83,16 +95,27 @@ async function createAccount(user: { id: string; email?: string }): Promise<{ id
 	const body = await v2.json().catch(() => ({}));
 	if (v2.ok && body.id) return { id: body.id };
 
+	const v2Reason = body?.error?.message || body?.error?.code || `HTTP ${v2.status}`;
 	console.error('accounts v2 create failed, falling back to v1:', v2.status, JSON.stringify(body?.error ?? body));
 
+	// Only reached when v2 refused. Its reason is logged above; if v1 refuses
+	// too, that message is the one the seller sees.
 	const legacy = await stripe('accounts', 'POST', {
 		type: 'express',
 		email: user.email ?? '',
+		// Paired for the same reason as the v2 path above: transfers alone is
+		// the gated shape.
+		'capabilities[card_payments][requested]': 'true',
 		'capabilities[transfers][requested]': 'true',
 		'business_profile[product_description]': 'Pre-owned and new fragrance sold on Vial',
 		'metadata[profile_id]': user.id,
 	});
-	if (legacy.error) return { error: legacy.error.message };
+	if (legacy.error) {
+		// Both paths refused. Reporting only the second reason sends anyone
+		// debugging this down the wrong road, since v2 is the path that
+		// normally runs.
+		return { error: `${legacy.error.message} (v2 also failed: ${v2Reason})` };
+	}
 	return { id: legacy.id };
 }
 
