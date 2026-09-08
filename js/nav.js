@@ -18,8 +18,10 @@ const CATEGORIES = [
 	{ label: 'Auctions', href: 'browse.html?auction=1' },
 	{ label: 'Under $50', href: 'browse.html?max=50' },
 	// Not a filter like the rest: the estimator is a destination, and this row
-	// is the only persistent surface wide enough to carry it on mobile.
-	{ label: "What's it worth?", href: 'estimate.html' },
+	// is the only persistent surface wide enough to carry it on mobile. The
+	// flag marks that difference for the stylesheet rather than letting it be
+	// inferred from the href.
+	{ label: "What's it worth?", href: 'estimate.html', feature: true },
 ];
 
 function renderCategoryNav() {
@@ -32,7 +34,8 @@ function renderCategoryNav() {
 		const [cPage, cQuery = ''] = c.href.split('?');
 		// "All" should only light up on a bare browse page, not every filtered view.
 		const isActive = cPage === page && (cQuery ? search === `?${cQuery}` : !search);
-		return `<a href="${c.href}" class="${isActive ? 'active' : ''}">${c.label}</a>`;
+		const classes = [isActive ? 'active' : '', c.feature ? 'feature' : ''].filter(Boolean).join(' ');
+		return `<a href="${c.href}"${classes ? ` class="${classes}"` : ''}>${c.label}</a>`;
 	}).join('')}</nav>`;
 }
 
@@ -54,7 +57,7 @@ async function renderHeaderActions() {
 	const displayName = profile?.display_name || profile?.username || user?.username || user?.email || 'Account';
 
 	el.innerHTML = `
-		<a href="sell.html" class="btn btn-on-shelf btn-sm">Sell a bottle</a>
+		<a href="sell.html" class="btn btn-sell btn-sm">Sell a bottle</a>
 		<a href="browse.html?view=liked" class="icon-link" aria-label="Liked items" title="Liked">
 			${iconHeart(false)}${likedCount ? `<span class="icon-count">${likedCount}</span>` : ''}
 		</a>

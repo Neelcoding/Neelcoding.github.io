@@ -456,7 +456,26 @@ textarea:focus-visible,
 	transform-origin: left;
 	transition: transform var(--dur) var(--ease);
 }
+/* The estimator is a tool, not a slice of the catalogue, so it is the one link
+   here that does not behave like the others. It takes the wordmark's amber to
+   say so.
+
+   This is a deliberate second exception to the rule that amber means liquid
+   volume. The first is the wordmark itself; both sit in the shelf band rather
+   than on a listing, so neither competes with a fill gauge for meaning. */
+.category-row a.feature {
+	color: var(--amber-bright);
+	font-weight: 600;
+	/* Italic as well as amber: the slant separates it from the upright
+	   taxonomy beside it even before the colour registers, and survives for
+	   anyone who cannot distinguish the hue. */
+	font-style: italic;
+}
+.category-row a.feature:hover { color: #f0bc5c; }
+.category-row a.feature::after { background: var(--amber-bright); }
+
 .category-row a.active { color: var(--on-shelf); }
+.category-row a.feature.active { color: var(--amber-bright); }
 .category-row a.active::after { transform: scaleX(1); }
 
 /* ---------- Account menu ---------- */
@@ -559,6 +578,21 @@ textarea:focus-visible,
 /* On the graphite band the polarity inverts. */
 .btn-on-shelf { background: var(--paper); color: var(--ink); }
 .btn-on-shelf:hover { background: #fff; }
+
+/* Selling is the action the marketplace most needs a visitor to take, and the
+   only one in the header that creates something rather than navigating to it.
+   It carries the wordmark's amber for that reason.
+
+   Its own class rather than a change to btn-on-shelf: the hero's "Explore
+   fragrances" shares that style and should stay quiet, since two amber
+   invitations on one screen would cancel each other out. Ink on amber-bright
+   clears 8:1, so the fill can be loud without the label being hard to read. */
+.btn-sell {
+	background: var(--amber-bright);
+	color: var(--ink);
+	font-weight: 700;
+}
+.btn-sell:hover { background: #f0bc5c; }
 .btn-ghost-shelf { background: transparent; border-color: var(--rule-on-shelf); color: var(--on-shelf); }
 .btn-ghost-shelf:hover { border-color: var(--on-shelf-2); background: var(--shelf-raised); }
 
