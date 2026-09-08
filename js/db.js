@@ -307,6 +307,29 @@ export async function updateListingStatus(id, status) {
 	}
 }
 
+/**
+ * Removes a listing outright.
+ *
+ * The database refuses this for anything an order references, by design: a
+ * buyer's order history would otherwise point at nothing. That refusal arrives
+ * as a foreign key violation, which is meaningless to a seller, so it is
+ * translated into the actual reason here.
+ */
+export async function deleteListing(id) {
+	if (isSupabaseConfigured) {
+		const supabase = await getSupabase();
+		const { error } = await supabase.from('listings').delete().eq('id', id);
+		if (error) {
+			if (error.code === '23503') {
+				throw new Error('This bottle has already been bought, so its listing has to stay for the buyer\'s records. Mark it sold instead.');
+			}
+			throw error;
+		}
+		return;
+	}
+	writeLocal(LOCAL_LISTINGS_KEY, localListings().filter((l) => l.id !== id));
+}
+
 function fileToDataUrl(file) {
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();

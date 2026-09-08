@@ -574,6 +574,18 @@ textarea:focus-visible,
 
 .btn-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
 .btn-danger:hover { background: var(--danger); color: var(--paper); }
+/* Armed state for a two-press delete: filled, so the second press reads as the
+   committing one rather than a repeat of the first. */
+.btn-danger.is-armed { background: var(--danger); color: var(--paper); }
+
+/* Why a row action failed, said in the row rather than in an alert. */
+.row-error {
+	flex-basis: 100%;
+	font-size: var(--text-sm);
+	color: var(--danger);
+	line-height: 1.5;
+	padding-top: var(--space-2);
+}
 
 /* On the graphite band the polarity inverts. */
 .btn-on-shelf { background: var(--paper); color: var(--ink); }

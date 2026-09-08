@@ -1,4 +1,4 @@
-import { getCurrentUser, getListingsBySeller, updateListingStatus, getPayoutStatus, CONDITIONS } from './db.js';
+import { getCurrentUser, getListingsBySeller, updateListingStatus, deleteListing, getPayoutStatus, CONDITIONS } from './db.js';
 import { renderThumbImage } from './icons.js';
 import { revealOnScroll } from './motion.js';
 import { renderEmptyState, renderSignedOut as renderSignedOutState } from './empty-state.js';
@@ -54,6 +54,45 @@ async function render() {
 			await updateListingStatus(listing.id, next);
 			render();
 		});
+
+		// Deleting is irreversible and the row gives no second chance, so the
+		// button asks for one: a first press turns it into the confirmation
+		// rather than opening a dialog over the page.
+		const del = document.getElementById(`delete-${listing.id}`);
+		let armed = false;
+		del?.addEventListener('click', async () => {
+			if (!armed) {
+				armed = true;
+				del.textContent = 'Delete for good?';
+				del.classList.add('is-armed');
+				setTimeout(() => {
+					if (!armed || !del.isConnected) return;
+					armed = false;
+					del.textContent = 'Delete';
+					del.classList.remove('is-armed');
+				}, 4000);
+				return;
+			}
+			del.disabled = true;
+			del.textContent = 'Deleting';
+			try {
+				await deleteListing(listing.id);
+				render();
+			} catch (err) {
+				del.disabled = false;
+				del.textContent = 'Delete';
+				del.classList.remove('is-armed');
+				armed = false;
+				const row = del.closest('.offer-row');
+				let note = row?.querySelector('.row-error');
+				if (!note && row) {
+					note = document.createElement('div');
+					note.className = 'row-error';
+					row.appendChild(note);
+				}
+				if (note) note.textContent = err.message || 'Could not delete this listing.';
+			}
+		});
 	});
 	revealOnScroll('.offer-row', { y: 14 });
 	warnIfUnpaid(listings.length);
@@ -94,6 +133,7 @@ function listingRow(listing) {
 			<div class="offer-actions">
 				<span class="offer-status ${listing.status === 'sold' ? 'declined' : 'accepted'}">${listing.status === 'sold' ? 'Sold' : 'Available'}</span>
 				<button class="btn btn-outline btn-sm" id="toggle-${listing.id}">${listing.status === 'sold' ? 'Mark available' : 'Mark sold'}</button>
+				<button class="btn btn-danger btn-sm" id="delete-${listing.id}">Delete</button>
 			</div>
 		</div>
 	`;
