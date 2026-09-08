@@ -402,16 +402,33 @@ textarea:focus-visible,
 .category-row {
 	display: flex;
 	align-items: center;
+	/* Spread across the full measure rather than clustering at the left. The
+	   row is the site's taxonomy, so it reads as a spanning index; gap becomes
+	   the floor between items rather than the spacing. */
+	justify-content: space-between;
 	gap: var(--space-3);
 	min-height: 44px;
-	padding: var(--space-3) 0;
+	/* The shorthand used to zero the container's horizontal gutter, which put
+	   this row 56px outside the measure the logo and header actions sit on.
+	   Invisible while the links clustered at the left; obvious once they span
+	   the full width. */
+	padding: var(--space-3) var(--gutter);
 	overflow-x: auto;
 	scrollbar-width: none;
+}
+/* Below the container width there is nothing to distribute, so the row falls
+   back to a normal scrolling strip instead of stretching six links across a
+   phone. */
+@media (max-width: 720px) {
+	.category-row { justify-content: flex-start; }
 }
 .category-row::-webkit-scrollbar { display: none; }
 .category-row a {
 	position: relative;
-	font-size: var(--text-sm);
+	/* Larger than the 13px interface default: spread across the full measure
+	   the links carry more weight as an index, and small type at that spacing
+	   reads as thin rather than considered. */
+	font-size: 15px;
 	font-weight: 500;
 	letter-spacing: 0.01em;
 	color: var(--on-shelf-2);
@@ -421,6 +438,11 @@ textarea:focus-visible,
 	transition: color var(--dur-fast) var(--ease);
 }
 .category-row a:hover { color: var(--on-shelf); }
+/* The end links align to the container edge rather than to their own padding,
+   so the row starts and finishes on the same measure as everything above and
+   below it. */
+.category-row a:first-child { padding-left: 0; }
+.category-row a:last-child { padding-right: 0; }
 /* The active rule is drawn, not toggled: it grows from the left edge. */
 .category-row a::after {
 	content: '';
