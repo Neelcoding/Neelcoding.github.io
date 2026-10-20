@@ -86,8 +86,9 @@ async function render() {
 				const row = del.closest('.offer-row');
 				let note = row?.querySelector('.row-error');
 				if (!note && row) {
-					note = document.createElement('div');
+					note = document.createElement('p');
 					note.className = 'row-error';
+					note.setAttribute('role', 'status');
 					row.appendChild(note);
 				}
 				if (note) note.textContent = err.message || 'Could not delete this listing.';

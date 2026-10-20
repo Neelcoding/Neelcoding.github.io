@@ -578,13 +578,19 @@ textarea:focus-visible,
    committing one rather than a repeat of the first. */
 .btn-danger.is-armed { background: var(--danger); color: var(--paper); }
 
-/* Why a row action failed, said in the row rather than in an alert. */
+/* Why a row action failed, said in the row rather than in an alert. Takes the
+   full width so it reads as a sentence under the row instead of a third column
+   fighting the title for space. */
 .row-error {
 	flex-basis: 100%;
+	width: 100%;
+	order: 99;
 	font-size: var(--text-sm);
 	color: var(--danger);
 	line-height: 1.5;
-	padding-top: var(--space-2);
+	margin: 0;
+	padding-top: var(--space-3);
+	border-top: 1px solid var(--rule);
 }
 
 /* On the graphite band the polarity inverts. */
@@ -1710,6 +1716,10 @@ hr.divider { border: none; border-top: 1px solid var(--line); margin: var(--spac
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	/* Wrapping lets a row-level message take its own line rather than being
+	   squeezed in beside the title, which collapsed the title to one word per
+	   line. */
+	flex-wrap: wrap;
 	gap: var(--space-4);
 	padding: var(--space-4);
 	border: 1px solid var(--line);
