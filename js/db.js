@@ -263,8 +263,14 @@ export async function createListing(listing, imageFiles = []) {
 	if (isSupabaseConfigured) {
 		const supabase = await getSupabase();
 		const images = [];
-		for (const file of imageFiles) {
-			const path = `${listing.seller_id}/${Date.now()}-${file.name}`;
+		for (const [i, file] of imageFiles.entries()) {
+			// Storage keys allow a narrow character set, and a phone or a
+			// screenshot supplies neither: "Screenshot 2026-10-20 at 3.46.42 PM.png"
+			// carries spaces and colons and is rejected outright with "Invalid
+			// key". The original name is not worth preserving here, since
+			// nothing reads it back, so only the extension survives.
+			const ext = (file.name.match(/\.([a-zA-Z0-9]+)$/)?.[1] || 'jpg').toLowerCase();
+			const path = `${listing.seller_id}/${Date.now()}-${i}.${ext}`;
 			const { error: uploadError } = await supabase.storage.from('listing-images').upload(path, file);
 			if (uploadError) throw uploadError;
 			const { data } = supabase.storage.from('listing-images').getPublicUrl(path);

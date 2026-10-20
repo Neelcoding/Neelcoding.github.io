@@ -3,6 +3,8 @@ import { renderSignedOut as renderSignedOutState } from './empty-state.js';
 
 const root = document.getElementById('sell-root');
 let selectedFiles = [];
+/** Matches the cap the storage upload loop assumes. */
+const MAX_IMAGES = 4;
 
 function escapeHtml(str) {
 	const div = document.createElement('div');
@@ -123,9 +125,10 @@ function renderForm(user) {
 
 				<div class="form-row">
 					<label>Photos (up to 4)</label>
-					<div class="image-drop" id="image-drop">Click to choose photos, or drag them here</div>
+					<div class="image-drop" id="image-drop">Click to choose photos, or drag them here<span class="image-drop-hint">Up to 4. Choose them one at a time if it is easier.</span></div>
 					<input type="file" id="s-images" accept="image/*" multiple style="display:none;" />
 					<div class="image-preview-row" id="image-preview"></div>
+					<p class="hint" id="image-count"></p>
 					<div class="hint">Real photos (including the batch code) build buyer trust.</div>
 				</div>
 
@@ -150,9 +153,53 @@ function renderForm(user) {
 	const dropZone = document.getElementById('image-drop');
 	const fileInput = document.getElementById('s-images');
 	dropZone.addEventListener('click', () => fileInput.click());
-	fileInput.addEventListener('change', () => {
-		selectedFiles = [...fileInput.files].slice(0, 4);
+
+	/** Adds to the selection rather than replacing it, and keeps the cap. */
+	function addFiles(files) {
+		const incoming = [...files].filter((f) => f.type.startsWith('image/'));
+		if (!incoming.length) return;
+		// Picking a second time used to overwrite the first choice, because the
+		// input reports only its own most recent files. Photographing a bottle
+		// from several angles means several trips to the picker, so the
+		// selection has to accumulate.
+		for (const f of incoming) {
+			if (selectedFiles.length >= MAX_IMAGES) break;
+			// Same file twice is a mis-click, not an intention.
+			if (selectedFiles.some((e) => e.name === f.name && e.size === f.size)) continue;
+			selectedFiles.push(f);
+		}
+		// Cleared so choosing the same file again still fires a change event.
+		fileInput.value = '';
 		renderPreviews();
+	}
+
+	fileInput.addEventListener('change', () => addFiles(fileInput.files));
+
+	// Drag and drop never worked: the zone said "drag them here" but nothing
+	// listened, so the browser took over and navigated away to the dropped
+	// file. The default has to be cancelled on dragover as well as drop, or the
+	// drop event is never delivered at all.
+	['dragenter', 'dragover'].forEach((evt) => {
+		dropZone.addEventListener(evt, (e) => {
+			e.preventDefault();
+			dropZone.classList.add('is-dragover');
+		});
+	});
+	['dragleave', 'drop'].forEach((evt) => {
+		dropZone.addEventListener(evt, (e) => {
+			e.preventDefault();
+			if (evt === 'dragleave' && dropZone.contains(e.relatedTarget)) return;
+			dropZone.classList.remove('is-dragover');
+		});
+	});
+	dropZone.addEventListener('drop', (e) => addFiles(e.dataTransfer?.files || []));
+
+	// A file dropped anywhere else would otherwise replace the page with the
+	// image, losing a half-filled form.
+	['dragover', 'drop'].forEach((evt) => {
+		window.addEventListener(evt, (e) => {
+			if (!dropZone.contains(e.target)) e.preventDefault();
+		});
 	});
 
 	document.getElementById('sell-form').addEventListener('submit', async (e) => {
@@ -196,12 +243,50 @@ function val(id) {
 
 function renderPreviews() {
 	const wrap = document.getElementById('image-preview');
+	// Every object URL from the previous pass is revoked before the row is
+	// rebuilt; without this each re-render pins another copy of the image in
+	// memory for the life of the page.
+	wrap.querySelectorAll('img').forEach((img) => URL.revokeObjectURL(img.src));
 	wrap.innerHTML = '';
-	selectedFiles.forEach((file) => {
+
+	selectedFiles.forEach((file, i) => {
+		const cell = document.createElement('div');
+		cell.className = 'image-preview-cell';
+
 		const img = document.createElement('img');
 		img.src = URL.createObjectURL(file);
-		wrap.appendChild(img);
+		img.alt = `Photo ${i + 1}`;
+		cell.appendChild(img);
+
+		// The first photo is the one buyers see in the grid, so it says so.
+		if (i === 0) {
+			const tag = document.createElement('span');
+			tag.className = 'image-preview-tag';
+			tag.textContent = 'Cover';
+			cell.appendChild(tag);
+		}
+
+		// Choosing the wrong photo used to mean starting the selection over.
+		const remove = document.createElement('button');
+		remove.type = 'button';
+		remove.className = 'image-preview-remove';
+		remove.setAttribute('aria-label', `Remove photo ${i + 1}`);
+		remove.textContent = '×';
+		remove.addEventListener('click', () => {
+			selectedFiles.splice(i, 1);
+			renderPreviews();
+		});
+		cell.appendChild(remove);
+
+		wrap.appendChild(cell);
 	});
+
+	const count = document.getElementById('image-count');
+	if (count) {
+		count.textContent = selectedFiles.length
+			? `${selectedFiles.length} of ${MAX_IMAGES} selected`
+			: '';
+	}
 }
 
 function showMsg(text, type) {
