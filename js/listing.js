@@ -7,6 +7,8 @@ import {
 	getBids,
 	placeBid,
 	getAccessToken,
+	getPayoutStatus,
+	startPayoutOnboarding,
 	CONDITIONS,
 } from './db.js';
 import { iconHeart, ICON_BAG, renderThumbImage, renderAvatar } from './icons.js';
@@ -20,6 +22,7 @@ const root = document.getElementById('listing-root');
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
 const purchaseStatus = params.get('purchase'); // 'success' | 'cancelled' | null
+const justPublished = params.get('published') === '1';
 
 function escapeHtml(str) {
 	const div = document.createElement('div');
@@ -79,6 +82,7 @@ async function render() {
 	const bids = listing.is_auction ? await getBids(listing.id) : [];
 
 	root.innerHTML = `
+		${justPublished && isOwner ? '<div id="publish-banner"></div>' : ''}
 		${purchaseBanner()}
 		<div class="listing-detail">
 			<div>
@@ -138,6 +142,9 @@ async function render() {
 
 	wireActionRow(listing, seller, currentUser, isOwner, bids);
 	wireAuctionPanel(listing, currentUser, isOwner, bids);
+	// Not awaited: it asks Stripe for payout status, and the listing should not
+	// wait on a network round trip to finish rendering.
+	if (justPublished && isOwner) renderPublishBanner();
 	revealOnScroll('.listing-detail > *', { y: 18 });
 }
 
@@ -271,6 +278,59 @@ function wireAuctionPanel(listing, currentUser, isOwner, bids) {
 
 function renderImage(img) {
 	return renderThumbImage(img);
+}
+
+/* The moment after publishing is the cheapest time to ask a seller for payout
+   details. Before it, the request is an obstacle in front of work they have not
+   started; after it, there is a finished listing on screen that cannot sell
+   until they do. eBay collects bank details at exactly this point for the same
+   reason.
+
+   Deliberately not a blocker. The listing is already live and stays live; this
+   only explains why it has no Buy button yet. */
+async function renderPublishBanner() {
+	const el = document.getElementById('publish-banner');
+	if (!el) return;
+
+	const first = `<strong>Your bottle is live.</strong> Share the link, or list another.`;
+
+	let status;
+	try {
+		status = await getPayoutStatus();
+	} catch {
+		// A failed status check should not turn a success into an error.
+		el.innerHTML = `<div class="publish-banner"><div>${first}</div></div>`;
+		return;
+	}
+
+	if (status.demo || status.payoutsEnabled) {
+		el.innerHTML = `<div class="publish-banner"><div>${first}</div></div>`;
+		return;
+	}
+
+	el.innerHTML = `
+		<div class="publish-banner is-action">
+			<div>
+				<strong>Your bottle is live, but nobody can buy it yet.</strong>
+				<p>Stripe needs your bank and ID details before money can reach you. It collects them directly, so none of it passes through Vial. Takes a couple of minutes, and you only do it once.</p>
+			</div>
+			<button class="btn btn-sell btn-sm" id="publish-payout">${status.connected ? 'Finish payout setup' : 'Set up payouts'}</button>
+		</div>`;
+
+	document.getElementById('publish-payout')?.addEventListener('click', async (e) => {
+		e.target.disabled = true;
+		e.target.textContent = 'Opening Stripe…';
+		try {
+			location.href = await startPayoutOnboarding();
+		} catch (err) {
+			e.target.disabled = false;
+			e.target.textContent = 'Set up payouts';
+			const note = document.createElement('p');
+			note.className = 'publish-banner-error';
+			note.textContent = err.message || 'Could not open Stripe just now. Try again from your account page.';
+			e.target.parentElement.appendChild(note);
+		}
+	});
 }
 
 function purchaseBanner() {

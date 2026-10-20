@@ -1474,6 +1474,37 @@ select {
 
 .image-preview-row { display: flex; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-3); }
 
+/* ---------- Just-published banner ----------
+   Shown once, to the seller, immediately after a listing goes up. */
+.publish-banner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-5);
+	flex-wrap: wrap;
+	padding: var(--space-4) var(--space-5);
+	margin-bottom: var(--space-6);
+	background: var(--surface);
+	border: 1px solid var(--rule);
+	border-left: 2px solid var(--success);
+	border-radius: var(--r-sm);
+	font-size: var(--text-sm);
+	color: var(--ink-2);
+}
+/* The version that needs something from the seller takes the amber edge the
+   header uses for the selling path, so it reads as a next step rather than as
+   a warning about something broken. */
+.publish-banner.is-action { border-left-color: var(--amber); }
+.publish-banner strong { color: var(--ink); font-weight: 600; }
+.publish-banner p { margin: var(--space-2) 0 0; max-width: 56ch; line-height: 1.55; }
+.publish-banner .btn { flex-shrink: 0; }
+.publish-banner-error {
+	flex-basis: 100%;
+	color: var(--danger);
+	font-size: var(--text-micro);
+	margin-top: var(--space-2) !important;
+}
+
 .form-msg { font-size: var(--text-sm); padding: var(--space-3) var(--space-4); border-radius: 8px; margin-bottom: var(--space-4); }
 .form-msg.error { background: #fbe9e7; color: var(--danger); }
 .form-msg.success { background: #e9f5ec; color: var(--success); }

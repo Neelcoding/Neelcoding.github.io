@@ -228,7 +228,10 @@ function renderForm(user) {
 				auction_ends_at: isAuction ? new Date(Date.now() + auctionDays * 86400000).toISOString() : null,
 			};
 			const created = await createListing(listing, selectedFiles);
-			location.href = `listing.html?id=${encodeURIComponent(created.id)}`;
+			// published=1 marks the arrival as the moment just after publishing,
+			// which is when asking for payout details costs the least: the work
+			// is done and there is something concrete to lose by stopping.
+			location.href = `listing.html?id=${encodeURIComponent(created.id)}&published=1`;
 		} catch (err) {
 			showMsg(err.message || 'Could not publish listing.', 'error');
 			submitBtn.disabled = false;
